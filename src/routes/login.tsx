@@ -172,8 +172,10 @@ function Login() {
             </motion.button>
 
             <p className="text-center text-xs text-white/50 pt-10 leading-relaxed">
-              Accounts are provisioned by your admin.<br />
-              Need access? <Link to="/forgot-password" className="text-primary font-semibold">Reset password</Link> or contact them.
+              New to AgriTwin?{" "}
+              <Link to="/signup" className="text-primary font-semibold">Create an account</Link>
+              <br />
+              <Link to="/forgot-password" className="mt-2 inline-block hover:text-white">Reset your password</Link>
             </p>
           </div>
         </div>
