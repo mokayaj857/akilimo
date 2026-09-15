@@ -85,7 +85,7 @@ function SignUp() {
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: `${window.location.origin}/login`,
         data: { full_name: fullName.trim() },
       },
     });
@@ -107,7 +107,7 @@ function SignUp() {
     setGoogleLoading(true);
     const domain = allowedDomain?.domain ?? undefined;
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/dashboard`,
+      redirect_uri: window.location.origin,
       ...(domain ? { extraParams: { hd: domain } } : {}),
     });
     if (result.error) {
