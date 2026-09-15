@@ -27,14 +27,13 @@ import { CURRENCIES, currencySymbol, formatMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/expenses/new")({
   head: () => ({ meta: [{ title: "New expense — Expense It" }] }),
-  validateSearch: (s: Record<string, unknown>) => ({
-    capture:
-      s.capture === "camera" || s.capture === "manual"
-        ? (s.capture as "camera" | "manual")
-        : undefined,
-    jobId: typeof s.jobId === "string" ? s.jobId : undefined,
-    expenseId: typeof s.expenseId === "string" ? s.expenseId : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>) => {
+    const out: { capture?: "camera" | "manual"; jobId?: string; expenseId?: string } = {};
+    if (s.capture === "camera" || s.capture === "manual") out.capture = s.capture;
+    if (typeof s.jobId === "string") out.jobId = s.jobId;
+    if (typeof s.expenseId === "string") out.expenseId = s.expenseId;
+    return out;
+  },
   component: NewExpense,
 });
 
