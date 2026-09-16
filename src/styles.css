@@ -37,6 +37,11 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-paper: var(--paper);
   --color-ink: var(--ink);
+  --color-earth: var(--earth);
+  --color-earth-foreground: var(--earth-foreground);
+  --color-risk: var(--risk);
+  --color-risk-foreground: var(--risk-foreground);
+  --color-sky: var(--sky);
 }
 
 :root {
@@ -68,6 +73,11 @@
   --ring: oklch(0.58 0.16 155);
   --paper: oklch(0.98 0.005 60);
   --ink: oklch(0.15 0.02 270);
+  --earth: oklch(0.72 0.13 79);
+  --earth-foreground: oklch(0.2 0.03 70);
+  --risk: oklch(0.63 0.19 30);
+  --risk-foreground: oklch(0.99 0 0);
+  --sky: oklch(0.7 0.11 225);
 }
 
 @supports (height: 100lvh) {
@@ -102,6 +112,11 @@
   --ring: oklch(0.66 0.17 155);
   --paper: oklch(1 0 0 / 6%);
   --ink: oklch(1 0 0);
+  --earth: oklch(0.77 0.13 79);
+  --earth-foreground: oklch(0.17 0.02 70);
+  --risk: oklch(0.68 0.18 30);
+  --risk-foreground: oklch(0.99 0 0);
+  --sky: oklch(0.74 0.11 225);
 }
 
 @layer base {
@@ -121,10 +136,20 @@
     min-height: var(--app-height);
     overscroll-behavior-y: none;
   }
+  button, a, input, select, textarea { letter-spacing: 0; }
   /* Hide native number spin */
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number] { -moz-appearance: textfield; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @layer utilities {
