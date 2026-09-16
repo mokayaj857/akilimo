@@ -19,9 +19,13 @@ import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPoliciesRouteImport } from './routes/_authenticated/policies'
+import { Route as AuthenticatedMarketsRouteImport } from './routes/_authenticated/markets'
+import { Route as AuthenticatedFinancingRouteImport } from './routes/_authenticated/financing'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
+import { Route as AuthenticatedDigitalTwinRouteImport } from './routes/_authenticated/digital-twin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCropHealthRouteImport } from './routes/_authenticated/crop-health'
 import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
 import { Route as AuthenticatedApprovalsRouteImport } from './routes/_authenticated/approvals'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -85,6 +89,16 @@ const AuthenticatedPoliciesRoute = AuthenticatedPoliciesRouteImport.update({
   path: '/policies',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMarketsRoute = AuthenticatedMarketsRouteImport.update({
+  id: '/markets',
+  path: '/markets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFinancingRoute = AuthenticatedFinancingRouteImport.update({
+  id: '/financing',
+  path: '/financing',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -95,9 +109,20 @@ const AuthenticatedExpensesRoute = AuthenticatedExpensesRouteImport.update({
   path: '/expenses',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDigitalTwinRoute =
+  AuthenticatedDigitalTwinRouteImport.update({
+    id: '/digital-twin',
+    path: '/digital-twin',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCropHealthRoute = AuthenticatedCropHealthRouteImport.update({
+  id: '/crop-health',
+  path: '/crop-health',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
@@ -180,9 +205,13 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/approvals': typeof AuthenticatedApprovalsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
+  '/crop-health': typeof AuthenticatedCropHealthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/digital-twin': typeof AuthenticatedDigitalTwinRoute
   '/expenses': typeof AuthenticatedExpensesRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
+  '/financing': typeof AuthenticatedFinancingRoute
+  '/markets': typeof AuthenticatedMarketsRoute
   '/policies': typeof AuthenticatedPoliciesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reports': typeof AuthenticatedReportsRouteWithChildren
@@ -206,9 +235,13 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/approvals': typeof AuthenticatedApprovalsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
+  '/crop-health': typeof AuthenticatedCropHealthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/digital-twin': typeof AuthenticatedDigitalTwinRoute
   '/expenses': typeof AuthenticatedExpensesRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
+  '/financing': typeof AuthenticatedFinancingRoute
+  '/markets': typeof AuthenticatedMarketsRoute
   '/policies': typeof AuthenticatedPoliciesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reports': typeof AuthenticatedReportsRouteWithChildren
@@ -235,9 +268,13 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/approvals': typeof AuthenticatedApprovalsRoute
   '/_authenticated/ask-ai': typeof AuthenticatedAskAiRoute
+  '/_authenticated/crop-health': typeof AuthenticatedCropHealthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/digital-twin': typeof AuthenticatedDigitalTwinRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
+  '/_authenticated/financing': typeof AuthenticatedFinancingRoute
+  '/_authenticated/markets': typeof AuthenticatedMarketsRoute
   '/_authenticated/policies': typeof AuthenticatedPoliciesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRouteWithChildren
@@ -264,9 +301,13 @@ export interface FileRouteTypes {
     | '/admin'
     | '/approvals'
     | '/ask-ai'
+    | '/crop-health'
     | '/dashboard'
+    | '/digital-twin'
     | '/expenses'
     | '/finance'
+    | '/financing'
+    | '/markets'
     | '/policies'
     | '/profile'
     | '/reports'
@@ -290,9 +331,13 @@ export interface FileRouteTypes {
     | '/signup'
     | '/approvals'
     | '/ask-ai'
+    | '/crop-health'
     | '/dashboard'
+    | '/digital-twin'
     | '/expenses'
     | '/finance'
+    | '/financing'
+    | '/markets'
     | '/policies'
     | '/profile'
     | '/reports'
@@ -318,9 +363,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/approvals'
     | '/_authenticated/ask-ai'
+    | '/_authenticated/crop-health'
     | '/_authenticated/dashboard'
+    | '/_authenticated/digital-twin'
     | '/_authenticated/expenses'
     | '/_authenticated/finance'
+    | '/_authenticated/financing'
+    | '/_authenticated/markets'
     | '/_authenticated/policies'
     | '/_authenticated/profile'
     | '/_authenticated/reports'
@@ -418,6 +467,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPoliciesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/markets': {
+      id: '/_authenticated/markets'
+      path: '/markets'
+      fullPath: '/markets'
+      preLoaderRoute: typeof AuthenticatedMarketsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financing': {
+      id: '/_authenticated/financing'
+      path: '/financing'
+      fullPath: '/financing'
+      preLoaderRoute: typeof AuthenticatedFinancingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/finance': {
       id: '/_authenticated/finance'
       path: '/finance'
@@ -432,11 +495,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedExpensesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/digital-twin': {
+      id: '/_authenticated/digital-twin'
+      path: '/digital-twin'
+      fullPath: '/digital-twin'
+      preLoaderRoute: typeof AuthenticatedDigitalTwinRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/crop-health': {
+      id: '/_authenticated/crop-health'
+      path: '/crop-health'
+      fullPath: '/crop-health'
+      preLoaderRoute: typeof AuthenticatedCropHealthRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/ask-ai': {
@@ -595,9 +672,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedApprovalsRoute: typeof AuthenticatedApprovalsRoute
   AuthenticatedAskAiRoute: typeof AuthenticatedAskAiRoute
+  AuthenticatedCropHealthRoute: typeof AuthenticatedCropHealthRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDigitalTwinRoute: typeof AuthenticatedDigitalTwinRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
+  AuthenticatedFinancingRoute: typeof AuthenticatedFinancingRoute
+  AuthenticatedMarketsRoute: typeof AuthenticatedMarketsRoute
   AuthenticatedPoliciesRoute: typeof AuthenticatedPoliciesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRouteWithChildren
@@ -608,9 +689,13 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedApprovalsRoute: AuthenticatedApprovalsRoute,
   AuthenticatedAskAiRoute: AuthenticatedAskAiRoute,
+  AuthenticatedCropHealthRoute: AuthenticatedCropHealthRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDigitalTwinRoute: AuthenticatedDigitalTwinRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
+  AuthenticatedFinancingRoute: AuthenticatedFinancingRoute,
+  AuthenticatedMarketsRoute: AuthenticatedMarketsRoute,
   AuthenticatedPoliciesRoute: AuthenticatedPoliciesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRouteWithChildren,
