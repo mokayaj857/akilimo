@@ -261,6 +261,18 @@
   }
 }
 
+@keyframes tape-run {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.tape-run {
+  animation: tape-run 26s linear infinite;
+}
+
 html,
 body,
 * {

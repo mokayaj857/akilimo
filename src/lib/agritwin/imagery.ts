@@ -57,6 +57,18 @@ export const MARKET_REEL = [
 
 export const MARKET_SRCS = MARKET_REEL.map((s) => s.src);
 
+/** Field-only stills for Desk — no stall or produce-shelf shots. */
+export const FIELD = [
+  SHOT.dawn,
+  SHOT.aerial,
+  SHOT.maize,
+  SHOT.farmer,
+  u("photo-1516026672322-bc52d61a55d5"),
+  u("photo-1509099836639-7b0cd47535a5"),
+  u("photo-1605000797499-95a51c5269ae"),
+  u("photo-1560493676-04071c5f73a7"),
+];
+
 export const CROP_SHOT: Record<string, string> = {
   "White Maize": SHOT.maize,
   "Rosecoco Beans": SHOT.beans,
