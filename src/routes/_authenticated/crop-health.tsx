@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CropScan } from "@/components/agritwin/CropScan";
 import { FarmPage } from "@/components/agritwin/Page";
 import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,7 @@ function CropHealthRoute() {
           <Button onClick={() => toast.success("Spray logged.")}>Log spray</Button>
         </div>
       )}
+      <CropScan />
     </FarmPage>
   );
 }

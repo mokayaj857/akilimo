@@ -5,8 +5,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { BrandMark } from "@/components/agritwin/BrandMark";
-import { PhotoReel } from "@/components/agritwin/PhotoReel";
+import { AuthStage } from "@/components/agritwin/AuthStage";
+import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { lovable } from "@/integrations/lovable";
@@ -118,164 +118,144 @@ function SignUp() {
 
   if (!ready) {
     return (
-      <main className="dark grid min-h-app place-items-center bg-background px-6 text-foreground">
+      <AuthStage kicker="New farm" title={<>One plot.<br />One twin.</>}>
         <p className="text-sm text-muted-foreground">Preparing your account…</p>
-      </main>
+      </AuthStage>
     );
   }
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground grid lg:grid-cols-[1.15fr_0.85fr]">
-      <aside className="photo relative hidden min-h-screen lg:block">
-        <PhotoReel />
-        <div className="absolute inset-0 bg-[#120f0a]/45" />
-        <div className="photo-copy relative z-10 flex h-full flex-col justify-between p-10">
-          <Link to="/" className="inline-flex items-center gap-2.5">
-            <BrandMark className="size-8" />
-            <span className="font-display text-xl">Akilimo</span>
-          </Link>
-          <p className="font-display text-5xl font-medium leading-[1.05] max-w-sm">
-            Draw the boundary.
-            <br />
-            Own the season.
+    <AuthStage kicker="New farm" title={<>Draw the line.<br />Own the season.</>}>
+      {confirmationEmail ? (
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Inbox</p>
+          <h2 className="font-display mt-1 text-3xl">Check the letter</h2>
+          <p className="mt-4 text-[14px] text-muted-foreground">
+            Sent to <span className="text-foreground">{confirmationEmail}</span>.
+          </p>
+          <Button asChild variant="outline" className="mt-6 h-11 w-full">
+            <Link to="/login">Sign in</Link>
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <div className="mb-6 flex items-end justify-between gap-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Ledger</p>
+              <p className="font-display mt-1 text-3xl leading-none">Register</p>
+            </div>
+            <LanguageSelector variant="button" />
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <AuthField label="Name">
+              <input
+                type="text"
+                autoComplete="name"
+                required
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+                className="w-full bg-transparent pb-2 pt-1 text-[15px] outline-none"
+              />
+            </AuthField>
+
+            <AuthField label="Email">
+              <input
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="w-full bg-transparent pb-2 pt-1 text-[15px] outline-none"
+              />
+            </AuthField>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <AuthField label="Password">
+                <div className="flex items-center">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    minLength={8}
+                    required
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className="min-w-0 flex-1 bg-transparent pb-2 pt-1 text-[15px] outline-none"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="size-8 shrink-0 text-muted-foreground"
+                  >
+                    {showPassword ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
+                  </Button>
+                </div>
+              </AuthField>
+
+              <AuthField label="Repeat">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  className="w-full bg-transparent pb-2 pt-1 text-[15px] outline-none"
+                />
+              </AuthField>
+            </div>
+
+            <label className="flex cursor-pointer items-start gap-3 text-[12px] text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(event) => setAcceptedTerms(event.target.checked)}
+                className="mt-0.5 size-3.5 shrink-0 accent-primary"
+              />
+              <span>I agree to the farm desk terms.</span>
+            </label>
+
+            <Button disabled={loading} type="submit" className="h-12 w-full">
+              {loading && <Loader2 className="animate-spin" aria-hidden />}
+              {loading ? "…" : "Start mapping"}
+            </Button>
+          </form>
+
+          <div className="my-5 flex items-center gap-3 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+            <div className="h-px flex-1 bg-white/15" />
+            <span>or</span>
+            <div className="h-px flex-1 bg-white/15" />
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={googleLoading}
+            onClick={handleGoogle}
+            className="h-11 w-full"
+          >
+            {googleLoading ? <Loader2 className="animate-spin" aria-hidden /> : null}
+            {googleLoading ? "…" : "Continue with Google"}
+          </Button>
+
+          <p className="pt-6 text-[13px] text-muted-foreground">
+            Already on the desk?{" "}
+            <Link to="/login" className="text-primary">
+              Sign in
+            </Link>
           </p>
         </div>
-      </aside>
-
-      <section className="flex flex-col justify-center px-6 py-10 sm:px-10">
-        <Link to="/" className="mb-10 flex items-center gap-2 lg:hidden">
-          <BrandMark className="size-7" />
-          <span className="font-display font-semibold">Akilimo</span>
-        </Link>
-
-        <div className="w-full max-w-sm">
-            {confirmationEmail ? (
-              <div>
-                <h2 className="font-display text-3xl font-semibold">Check inbox</h2>
-                <div className="rule mt-3 w-16" />
-                <p className="mt-4 text-[13px] text-muted-foreground">
-                  Link sent to <span className="text-foreground">{confirmationEmail}</span>.
-                </p>
-                <Button asChild variant="outline" className="mt-6">
-                  <Link to="/login">Sign in</Link>
-                </Button>
-              </div>
-            ) : (
-              <>
-                <h2 className="font-display text-3xl font-semibold">Register</h2>
-                <div className="rule mt-3 w-16 mb-6" />
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <AuthField label="Name">
-                    <input
-                      type="text"
-                      autoComplete="name"
-                      required
-                      value={fullName}
-                      onChange={(event) => setFullName(event.target.value)}
-                      className="w-full bg-transparent pb-2 pt-1 text-[13px] outline-none"
-                    />
-                  </AuthField>
-
-                  <AuthField label="Email">
-                    <input
-                      type="email"
-                      autoComplete="email"
-                      required
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      className="w-full bg-transparent pb-2 pt-1 text-[13px] outline-none"
-                    />
-                  </AuthField>
-
-                  <div className="grid gap-5 sm:grid-cols-2">
-                    <AuthField label="Password">
-                      <div className="flex items-center">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          autoComplete="new-password"
-                          minLength={8}
-                          required
-                          value={password}
-                          onChange={(event) => setPassword(event.target.value)}
-                          className="min-w-0 flex-1 bg-transparent pb-2 pt-1 text-[13px] outline-none"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setShowPassword((visible) => !visible)}
-                          aria-label={showPassword ? "Hide password" : "Show password"}
-                          className="size-8 shrink-0 text-muted-foreground"
-                        >
-                          {showPassword ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
-                        </Button>
-                      </div>
-                    </AuthField>
-
-                    <AuthField label="Repeat">
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        autoComplete="new-password"
-                        minLength={8}
-                        required
-                        value={confirmPassword}
-                        onChange={(event) => setConfirmPassword(event.target.value)}
-                        className="w-full bg-transparent pb-2 pt-1 text-[13px] outline-none"
-                      />
-                    </AuthField>
-                  </div>
-
-                  <label className="flex cursor-pointer items-start gap-3 text-[12px] text-muted-foreground">
-                    <input
-                      type="checkbox"
-                      checked={acceptedTerms}
-                      onChange={(event) => setAcceptedTerms(event.target.checked)}
-                      className="mt-0.5 size-3.5 shrink-0 accent-primary"
-                    />
-                    <span>Accept terms.</span>
-                  </label>
-
-                  <Button disabled={loading} type="submit" className="h-10 w-full">
-                    {loading && <Loader2 className="animate-spin" aria-hidden />}
-                    {loading ? "…" : "Create"}
-                  </Button>
-                </form>
-
-                <div className="my-5 flex items-center gap-3 text-[11px] text-muted-foreground">
-                  <div className="h-px flex-1 bg-border" />
-                  <span>or</span>
-                  <div className="h-px flex-1 bg-border" />
-                </div>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={googleLoading}
-                  onClick={handleGoogle}
-                  className="h-10 w-full"
-                >
-                  {googleLoading ? <Loader2 className="animate-spin" aria-hidden /> : <span aria-hidden>G</span>}
-                  {googleLoading ? "…" : "Google"}
-                </Button>
-
-                <p className="pt-6 text-[12px] text-muted-foreground">
-                  Have an account?{" "}
-                  <Link to="/login" className="text-primary">
-                    Sign in
-                  </Link>
-                </p>
-              </>
-            )}
-        </div>
-      </section>
-    </div>
+      )}
+    </AuthStage>
   );
 }
 
 function AuthField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block border-b border-border focus-within:border-primary">
+    <label className="block border-b border-white/20 focus-within:border-primary">
       <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">{label}</span>
       {children}
     </label>
