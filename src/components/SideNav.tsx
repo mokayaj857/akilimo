@@ -14,7 +14,6 @@ import {
 import { useEffect, useState } from "react";
 import { BrandMark } from "@/components/agritwin/BrandMark";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { cropShot } from "@/lib/agritwin/imagery";
 
 const ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
   { to: "/dashboard", label: "Desk", icon: LayoutDashboard },
@@ -28,7 +27,7 @@ const ITEMS: { to: string; label: string; icon: LucideIcon }[] = [
 export function SideNav() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [collapsed, setCollapsed] = useState(false);
-  const { diseasePrediction, twin } = useFarmState();
+  const { diseasePrediction } = useFarmState();
 
   useEffect(() => {
     try {
@@ -98,13 +97,6 @@ export function SideNav() {
           );
         })}
       </nav>
-      {!collapsed && (
-        <div className="photo relative h-28 overflow-hidden">
-          <img src={cropShot(twin.primaryCrop)} alt="" />
-          <div className="shade absolute inset-0" />
-          <p className="photo-copy absolute bottom-2 left-3 z-[3] font-display text-sm">{twin.farmName.split(" ")[0]}</p>
-        </div>
-      )}
     </motion.aside>
   );
 }

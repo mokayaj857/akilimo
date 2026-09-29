@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { MARKET_REEL } from "@/lib/agritwin/imagery";
+import { MARKET_REEL, MARKET_SRCS } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated/markets")({
   head: () => ({
@@ -25,9 +25,14 @@ function MarketsRoute() {
 
   return (
     <main className="relative min-h-[calc(var(--app-height)-3.5rem)]">
-      <PhotoReel slides={MARKET_REEL} onIndex={setSlide} />
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[#14120e]/20" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[45%] bg-gradient-to-t from-[#14120e] to-transparent" />
+      <PhotoReel
+        ordered
+        holdMs={3200}
+        slides={MARKET_SRCS}
+        onIndex={setSlide}
+      />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-[#14120e]/12" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[40%] bg-gradient-to-t from-[#14120e] to-transparent" />
 
       <div className="relative z-[2] px-5 pb-28 pt-6 md:px-10 md:pb-12">
         <div className="flex items-start justify-between gap-4">
@@ -48,7 +53,7 @@ function MarketsRoute() {
           <div className="flex gap-1.5 pt-2">
             {MARKET_REEL.map((s, idx) => (
               <span
-                key={s.src}
+                key={s.src + s.place}
                 className={`h-1 w-5 transition-colors ${idx === slide ? "bg-primary" : "bg-white/30"}`}
               />
             ))}
@@ -64,7 +69,7 @@ function MarketsRoute() {
           </p>
         </div>
 
-        <div className="mt-5 border border-white/12 bg-[#14120e]/60 backdrop-blur-md md:max-w-md md:ml-auto">
+        <div className="mt-5 border border-white/12 bg-[#14120e]/60 backdrop-blur-md md:ml-auto md:max-w-md">
           {ranked.map((mkt, idx) => (
             <motion.div
               key={mkt.id}

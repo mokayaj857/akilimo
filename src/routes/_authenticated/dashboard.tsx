@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { cropShot, marketShot, SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -11,10 +11,9 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 function DashboardPage() {
-  const { profile, twin, diseasePrediction, markets, saccoOptions, creditReadinessScore } = useFarmState();
+  const { twin, diseasePrediction, markets, saccoOptions, creditReadinessScore } = useFarmState();
   const sell = markets.find((m) => m.isTopRecommendation) || markets[0];
   const lender = saccoOptions.find((l) => l.isRecommended) || saccoOptions[0];
-  const first = (profile.fullName || "Farmer").split(" ")[0];
 
   return (
     <main className="mx-auto w-full max-w-[1120px] px-4 pb-8 pt-4 md:px-7">
@@ -28,19 +27,15 @@ function DashboardPage() {
         to="/digital-twin"
         className="photo relative block h-[46vh] min-h-[300px] overflow-hidden md:h-[54vh]"
       >
-        <img src={cropShot(twin.primaryCrop)} alt="" />
+        <PhotoReel />
         <div className="photo-copy photo-plate absolute inset-0 z-[3] flex flex-col justify-end p-5 pb-24 md:p-8 md:pb-8">
-          <p className="text-[12px] uppercase tracking-[0.2em] text-primary">{twin.farmName}</p>
-          <h1 className="font-display mt-1 text-5xl font-medium leading-[0.9] md:text-7xl">{first}</h1>
-          <p className="mt-4 num text-[15px] text-[#f7f1e4]/90">
-            {twin.totalAcres} ac · {twin.primaryCrop}
-          </p>
+          <h1 className="font-display text-5xl font-medium leading-[0.9] md:text-7xl">Welcome farmer</h1>
         </div>
       </Link>
 
       <div className="mt-3 grid gap-3 md:grid-cols-3">
         <Link to="/crop-health" className="photo group relative h-56 overflow-hidden md:h-72">
-          <img src={SHOT.maizeLeaf} alt="" className="transition duration-500 group-hover:scale-105" />
+          <PhotoReel />
           <div className="photo-copy photo-plate absolute inset-0 z-[3] flex flex-col justify-end p-4">
             <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Watch</p>
             <p className="font-display text-3xl text-risk">{diseasePrediction.riskLevel}</p>
@@ -51,7 +46,7 @@ function DashboardPage() {
         </Link>
 
         <Link to="/markets" className="photo group relative h-56 overflow-hidden md:h-72">
-          <img src={marketShot(sell.town)} alt="" className="transition duration-500 group-hover:scale-105" />
+          <PhotoReel />
           <div className="photo-copy photo-plate absolute inset-0 z-[3] flex flex-col justify-end p-4">
             <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Sell</p>
             <p className="font-display text-3xl">{sell.town.split(" ")[0]}</p>
@@ -60,7 +55,7 @@ function DashboardPage() {
         </Link>
 
         <Link to="/financing" className="photo group relative h-56 overflow-hidden md:h-72">
-          <img src={SHOT.hands} alt="" className="transition duration-500 group-hover:scale-105" />
+          <PhotoReel />
           <div className="photo-copy photo-plate absolute inset-0 z-[3] flex flex-col justify-end p-4">
             <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Credit</p>
             <p className="num text-4xl">{creditReadinessScore}</p>

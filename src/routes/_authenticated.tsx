@@ -1,11 +1,9 @@
 import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Box, HeartPulse, LayoutDashboard, Menu, Store, User, Wallet, X } from "lucide-react";
-import { BrandMark } from "@/components/agritwin/BrandMark";
 import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { SideNav } from "@/components/SideNav";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { cropShot } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthedLayout });
 
@@ -18,7 +16,7 @@ const NAV = [
 ] as const;
 
 function AuthedLayout() {
-  const { profile, twin } = useFarmState();
+  const { profile } = useFarmState();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,17 +40,10 @@ function AuthedLayout() {
             >
               {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
             </button>
-            <Link to="/dashboard" className="flex items-center gap-2">
-              <BrandMark className="size-6" />
-              <span className="font-display text-sm font-semibold">Akilimo</span>
-            </Link>
+            <p className="font-display text-sm text-foreground">Welcome farmer</p>
           </div>
 
-          <div className="hidden md:flex items-center gap-3 text-[12px]">
-            <img src={cropShot(twin.primaryCrop)} alt="" className="size-8 object-cover" />
-            <span className="text-foreground">{twin.farmName}</span>
-            <span className="num text-primary">{twin.totalAcres} ac</span>
-          </div>
+          <p className="hidden font-display text-[15px] text-foreground md:block">Welcome farmer</p>
 
           <div className="flex items-center gap-1">
             <LanguageSelector variant="button" />

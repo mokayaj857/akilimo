@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FarmPage } from "@/components/agritwin/Page";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { SHOT } from "@/lib/agritwin/imagery";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/crop-health")({
@@ -20,7 +20,7 @@ function CropHealthRoute() {
   return (
     <FarmPage title="Watch" bleed>
       <div className="photo relative h-[62vh] min-h-[360px] overflow-hidden md:h-[70vh]">
-        <img src={SHOT.maizeLeaf} alt="" />
+        <PhotoReel />
         <div className="photo-copy absolute inset-0 z-[3] flex flex-col justify-between p-5 pb-24 md:p-10 md:pb-10">
           <p className="text-[11px] uppercase tracking-[0.22em] text-primary">{twin.primaryCrop}</p>
           <div className="photo-plate -mx-5 px-5 pt-20 md:-mx-10 md:px-10">

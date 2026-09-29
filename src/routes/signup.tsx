@@ -6,12 +6,12 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { BrandMark } from "@/components/agritwin/BrandMark";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { getAllowedEmailDomain } from "@/lib/app-settings.functions";
-import { SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: async () => {
@@ -127,7 +127,7 @@ function SignUp() {
   return (
     <div className="dark min-h-screen bg-background text-foreground grid lg:grid-cols-[1.15fr_0.85fr]">
       <aside className="photo relative hidden min-h-screen lg:block">
-        <img src={SHOT.maize} alt="" className="absolute inset-0 size-full object-cover" />
+        <PhotoReel />
         <div className="absolute inset-0 bg-[#120f0a]/45" />
         <div className="photo-copy relative z-10 flex h-full flex-col justify-between p-10">
           <Link to="/" className="inline-flex items-center gap-2.5">

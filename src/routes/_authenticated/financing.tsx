@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FarmPage } from "@/components/agritwin/Page";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { lenderShot, SHOT } from "@/lib/agritwin/imagery";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/financing")({
@@ -20,7 +20,7 @@ function FinancingRoute() {
   return (
     <FarmPage title="Credit" bleed>
       <div className="photo relative h-[52vh] min-h-[320px] overflow-hidden md:h-[58vh]">
-        <img src={SHOT.farmer} alt="" className="object-[center_80%]" />
+        <PhotoReel />
         <div className="photo-copy photo-plate absolute inset-0 z-[3] flex flex-col justify-end p-5 pb-24 md:p-10 md:pb-10">
           <p className="text-[11px] uppercase tracking-[0.22em] text-primary">Twin score</p>
           <div className="mt-2 flex items-end justify-between gap-4">
@@ -41,7 +41,7 @@ function FinancingRoute() {
             key={opt.id}
             className={`photo relative h-28 overflow-hidden md:h-32 ${opt.isRecommended ? "ring-1 ring-primary" : ""}`}
           >
-            <img src={lenderShot(opt.institutionType)} alt="" className="opacity-50" />
+            <PhotoReel />
             <div className="absolute inset-0 bg-gradient-to-r from-[#14120e] via-[#14120e]/88 to-[#14120e]/45" />
             <div className="photo-copy absolute inset-0 z-[3] flex items-center justify-between gap-3 p-4 md:px-6">
               <div className="min-w-0">

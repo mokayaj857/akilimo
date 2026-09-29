@@ -2,10 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { BrandMark } from "@/components/agritwin/BrandMark";
-import { FarmMapper, acresFromPoints, type MapPoint } from "@/components/agritwin/FarmMapper";
+import { FarmMapper, acresFromPoints, toRelativePolygon, type MapPoint } from "@/components/agritwin/FarmMapper";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { CROP_SHOT, cropShot, SHOT } from "@/lib/agritwin/imagery";
+import { CROP_SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -38,7 +39,7 @@ function OnboardingRoute() {
       county,
       crop,
       acres: acres || 3.8,
-      polygon: points.map((p) => [p.x, p.y] as [number, number]),
+      polygon: toRelativePolygon(points),
     });
     setTimeout(() => {
       setBuilding(false);
@@ -59,7 +60,7 @@ function OnboardingRoute() {
       {step === 1 && (
         <div className="grid min-h-screen lg:grid-cols-2">
           <div className="photo relative hidden min-h-[40vh] lg:block">
-            <img src={cropShot(crop)} alt="" />
+            <PhotoReel />
             <p className="photo-copy photo-plate absolute inset-x-0 bottom-0 z-[3] px-10 pb-10 pt-24 font-display text-5xl leading-none">{crop}</p>
           </div>
           <div className="flex flex-col justify-center px-5 pb-10 pt-20 sm:px-12">
@@ -120,7 +121,7 @@ function OnboardingRoute() {
                 </div>
               </div>
               <Button className="h-11 w-full" onClick={() => setStep(2)}>
-                Draw on satellite
+                Draw on the map
               </Button>
             </div>
           </div>
@@ -131,8 +132,8 @@ function OnboardingRoute() {
         <div className="flex min-h-screen flex-col pt-14">
           <div className="flex items-end justify-between px-4 py-4 md:px-8">
             <div>
-              <h1 className="font-display text-3xl font-medium md:text-4xl">Trace the land</h1>
-              <p className="mt-1 text-[13px] text-muted-foreground">{county} · tap each corner</p>
+              <h1 className="font-display text-3xl font-medium md:text-4xl">Map the farm</h1>
+              <p className="mt-1 text-[13px] text-muted-foreground">{county} · tap each corner on the map</p>
             </div>
             <Button variant="outline" onClick={() => setStep(1)}>
               <ArrowLeft className="size-3.5" />
@@ -151,7 +152,7 @@ function OnboardingRoute() {
 
       {step === 3 && (
         <div className="relative min-h-screen">
-          <img src={SHOT.aerial} alt="" className="bg-blur absolute inset-0 size-full object-cover" />
+          <PhotoReel />
           <div className="absolute inset-0 bg-[#120f0a]/32" />
           <div className="photo-copy relative z-10 flex min-h-screen flex-col justify-end p-6 pb-16 md:p-16">
             <p className="text-[12px] uppercase tracking-[0.2em] text-primary">Live</p>

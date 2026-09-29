@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Farm3DViewer } from "@/components/agritwin/Farm3DViewer";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { cropShot, SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated/digital-twin")({
   head: () => ({
@@ -16,7 +16,7 @@ function DigitalTwinRoute() {
   return (
     <main className="space-y-0">
       <div className="photo relative h-44 overflow-hidden md:h-56">
-        <img src={cropShot(twin.primaryCrop) || SHOT.maize} alt="" />
+        <PhotoReel />
         <div className="photo-copy photo-plate absolute inset-0 z-[3] flex items-end justify-between p-5 md:px-8 md:pb-6">
           <div>
             <h1 className="font-display text-4xl font-medium md:text-5xl">Twin</h1>

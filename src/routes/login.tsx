@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/agritwin/BrandMark";
 import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
@@ -46,9 +46,9 @@ function Login() {
 
   return (
     <div className="dark relative min-h-screen overflow-hidden bg-background text-foreground">
-      <img src={SHOT.dawn} alt="" className="bg-blur absolute inset-0 size-full object-cover" />
-      <div className="absolute inset-0 bg-[#120f0a]/28" />
-      <div className="shade-side absolute inset-0" />
+      <PhotoReel />
+      <div className="absolute inset-0 z-[1] bg-[#120f0a]/28" />
+      <div className="shade-side absolute inset-0 z-[1]" />
 
       <div className="relative z-10 flex min-h-screen flex-col justify-between p-6 sm:p-10 lg:flex-row lg:items-end">
         <div className="max-w-xl pb-10">
