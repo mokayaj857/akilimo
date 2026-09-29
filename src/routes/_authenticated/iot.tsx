@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/ask-ai")({
+export const Route = createFileRoute("/_authenticated/iot")({
   beforeLoad: () => {
-    throw redirect({ to: "/dashboard" });
+    throw redirect({ to: "/digital-twin" });
   },
   component: () => null,
 });

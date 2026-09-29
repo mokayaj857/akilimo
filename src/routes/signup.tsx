@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { motion } from "framer-motion";
-import { Check, Eye, EyeOff, Loader2, Sprout } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-import DarkVeil from "@/components/DarkVeil";
+import { BrandMark } from "@/components/agritwin/BrandMark";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { getAllowedEmailDomain } from "@/lib/app-settings.functions";
+import { SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: async () => {
@@ -20,12 +20,12 @@ export const Route = createFileRoute("/signup")({
   },
   head: () => ({
     meta: [
-      { title: "Create your AgriTwin account" },
+      { title: "Create your Akilimo account" },
       {
         name: "description",
-        content: "Create your AgriTwin account to monitor crop health, understand markets, and build your farm's digital twin.",
+        content: "Create your Akilimo account to monitor crop health, understand markets, and build your farm's digital twin.",
       },
-      { property: "og:title", content: "Create your AgriTwin account" },
+      { property: "og:title", content: "Create your Akilimo account" },
       {
         property: "og:description",
         content: "Start using AI-powered crop insights, market intelligence, and farm financing recommendations.",
@@ -96,7 +96,7 @@ function SignUp() {
       return;
     }
     if (data.session) {
-      navigate({ to: "/dashboard", replace: true });
+      navigate({ to: "/onboarding", replace: true });
       return;
     }
     setConfirmationEmail(email.trim());
@@ -125,78 +125,55 @@ function SignUp() {
   }
 
   return (
-    <main className="dark relative min-h-app overflow-hidden bg-background text-foreground">
-      <div aria-hidden className="pointer-events-none fixed inset-0 z-0">
-        <DarkVeil
-          hueShift={140}
-          noiseIntensity={0}
-          scanlineIntensity={0}
-          speed={0.4}
-          scanlineFrequency={0}
-          warpAmount={0}
-          resolutionScale={1}
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,color-mix(in_oklab,var(--background)_40%,transparent)_42%,var(--background)_100%)] md:bg-[linear-gradient(90deg,transparent_0%,color-mix(in_oklab,var(--background)_60%,transparent)_58%,var(--background)_100%)]" />
-      </div>
+    <div className="dark min-h-screen bg-background text-foreground grid lg:grid-cols-[1.15fr_0.85fr]">
+      <aside className="photo relative hidden min-h-screen lg:block">
+        <img src={SHOT.maize} alt="" className="absolute inset-0 size-full object-cover" />
+        <div className="absolute inset-0 bg-[#120f0a]/45" />
+        <div className="relative z-10 flex h-full flex-col justify-between p-10">
+          <Link to="/" className="inline-flex items-center gap-2.5">
+            <BrandMark className="size-8" />
+            <span className="font-display text-xl">Akilimo</span>
+          </Link>
+          <p className="font-display text-5xl font-medium leading-[1.05] max-w-sm">
+            Draw the boundary.
+            <br />
+            Own the season.
+          </p>
+        </div>
+      </aside>
 
-      <div className="relative z-10 grid min-h-app grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.05fr_1fr]">
-        <section className="flex flex-col justify-end px-6 pb-5 pt-14 md:justify-center md:p-12 lg:p-20 xl:p-24">
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="max-w-xl"
-          >
-            <div className="mb-4 flex items-center gap-2 text-primary">
-              <Sprout className="size-5" aria-hidden />
-              <span className="text-xs font-semibold uppercase tracking-widest">Farm intelligence</span>
-            </div>
-            <h1 className="text-5xl font-black uppercase leading-none md:text-7xl lg:text-8xl">
-              Agri<br className="hidden md:block" />Twin
-            </h1>
-            <p className="mt-4 max-w-lg text-sm font-medium leading-relaxed text-muted-foreground md:text-base">
-              See your farm clearly. Anticipate crop risk, find stronger markets, and discover financing built around your farm.
-            </p>
-          </motion.div>
-        </section>
+      <section className="flex flex-col justify-center px-6 py-10 sm:px-10">
+        <Link to="/" className="mb-10 flex items-center gap-2 lg:hidden">
+          <BrandMark className="size-7" />
+          <span className="font-display font-semibold">Akilimo</span>
+        </Link>
 
-        <section className="flex flex-col justify-center px-6 pb-10 pt-2 md:p-10 lg:p-14">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.2 }}
-            className="w-full max-w-lg md:ml-auto md:rounded-3xl md:bg-card md:p-9 md:ring-1 md:ring-border md:backdrop-blur-2xl"
-          >
+        <div className="w-full max-w-sm">
             {confirmationEmail ? (
-              <div className="py-8 text-center">
-                <div className="mx-auto grid size-14 place-items-center rounded-full bg-primary text-primary-foreground">
-                  <Check className="size-7" aria-hidden />
-                </div>
-                <h2 className="mt-6 text-2xl font-semibold">Check your inbox</h2>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  We sent a confirmation link to <span className="font-semibold text-foreground">{confirmationEmail}</span>.
+              <div>
+                <h2 className="font-display text-3xl font-semibold">Check inbox</h2>
+                <div className="rule mt-3 w-16" />
+                <p className="mt-4 text-[13px] text-muted-foreground">
+                  Link sent to <span className="text-foreground">{confirmationEmail}</span>.
                 </p>
-                <Button asChild variant="outline" className="mt-7 h-11 rounded-xl px-6">
-                  <Link to="/login">Back to sign in</Link>
+                <Button asChild variant="outline" className="mt-6">
+                  <Link to="/login">Sign in</Link>
                 </Button>
               </div>
             ) : (
               <>
-                <div className="mb-7">
-                  <h2 className="text-2xl font-semibold">Create your farm account</h2>
-                  <p className="mt-1 text-sm text-muted-foreground">Your farm setup comes next and takes only a few minutes.</p>
-                </div>
+                <h2 className="font-display text-3xl font-semibold">Register</h2>
+                <div className="rule mt-3 w-16 mb-6" />
 
                 <form onSubmit={handleSubmit} className="space-y-5">
-                  <AuthField label="Full name">
+                  <AuthField label="Name">
                     <input
                       type="text"
                       autoComplete="name"
                       required
                       value={fullName}
                       onChange={(event) => setFullName(event.target.value)}
-                      className="w-full bg-transparent pb-2 pt-1 text-base font-medium outline-none placeholder:text-muted-foreground/50"
-                      placeholder="Your full name"
+                      className="w-full bg-transparent pb-2 pt-1 text-[13px] outline-none"
                     />
                   </AuthField>
 
@@ -207,8 +184,7 @@ function SignUp() {
                       required
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="w-full bg-transparent pb-2 pt-1 text-base font-medium outline-none placeholder:text-muted-foreground/50"
-                      placeholder="you@example.com"
+                      className="w-full bg-transparent pb-2 pt-1 text-[13px] outline-none"
                     />
                   </AuthField>
 
@@ -222,8 +198,7 @@ function SignUp() {
                           required
                           value={password}
                           onChange={(event) => setPassword(event.target.value)}
-                          className="min-w-0 flex-1 bg-transparent pb-2 pt-1 text-base font-medium outline-none placeholder:text-muted-foreground/50"
-                          placeholder="8+ characters"
+                          className="min-w-0 flex-1 bg-transparent pb-2 pt-1 text-[13px] outline-none"
                         />
                         <Button
                           type="button"
@@ -231,15 +206,14 @@ function SignUp() {
                           size="icon"
                           onClick={() => setShowPassword((visible) => !visible)}
                           aria-label={showPassword ? "Hide password" : "Show password"}
-                          title={showPassword ? "Hide password" : "Show password"}
-                          className="size-8 shrink-0 rounded-full text-muted-foreground"
+                          className="size-8 shrink-0 text-muted-foreground"
                         >
                           {showPassword ? <EyeOff aria-hidden /> : <Eye aria-hidden />}
                         </Button>
                       </div>
                     </AuthField>
 
-                    <AuthField label="Confirm password">
+                    <AuthField label="Repeat">
                       <input
                         type={showPassword ? "text" : "password"}
                         autoComplete="new-password"
@@ -247,33 +221,28 @@ function SignUp() {
                         required
                         value={confirmPassword}
                         onChange={(event) => setConfirmPassword(event.target.value)}
-                        className="w-full bg-transparent pb-2 pt-1 text-base font-medium outline-none placeholder:text-muted-foreground/50"
-                        placeholder="Repeat password"
+                        className="w-full bg-transparent pb-2 pt-1 text-[13px] outline-none"
                       />
                     </AuthField>
                   </div>
 
-                  <label className="flex cursor-pointer items-start gap-3 text-xs leading-relaxed text-muted-foreground">
+                  <label className="flex cursor-pointer items-start gap-3 text-[12px] text-muted-foreground">
                     <input
                       type="checkbox"
                       checked={acceptedTerms}
                       onChange={(event) => setAcceptedTerms(event.target.checked)}
-                      className="mt-0.5 size-4 shrink-0 accent-primary"
+                      className="mt-0.5 size-3.5 shrink-0 accent-primary"
                     />
-                    <span>I agree to the Terms of Service and Privacy Policy.</span>
+                    <span>Accept terms.</span>
                   </label>
 
-                  <Button
-                    disabled={loading}
-                    type="submit"
-                    className="h-12 w-full rounded-2xl font-semibold shadow-lg transition-transform active:scale-[0.98]"
-                  >
+                  <Button disabled={loading} type="submit" className="h-10 w-full">
                     {loading && <Loader2 className="animate-spin" aria-hidden />}
-                    {loading ? "Creating account…" : "Create account"}
+                    {loading ? "…" : "Create"}
                   </Button>
                 </form>
 
-                <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
+                <div className="my-5 flex items-center gap-3 text-[11px] text-muted-foreground">
                   <div className="h-px flex-1 bg-border" />
                   <span>or</span>
                   <div className="h-px flex-1 bg-border" />
@@ -284,24 +253,23 @@ function SignUp() {
                   variant="outline"
                   disabled={googleLoading}
                   onClick={handleGoogle}
-                  className="h-12 w-full rounded-2xl bg-secondary font-semibold transition-transform active:scale-[0.98]"
+                  className="h-10 w-full"
                 >
-                  {googleLoading ? <Loader2 className="animate-spin" aria-hidden /> : <span aria-hidden className="text-base font-bold">G</span>}
-                  {googleLoading ? "Opening Google…" : "Continue with Google"}
+                  {googleLoading ? <Loader2 className="animate-spin" aria-hidden /> : <span aria-hidden>G</span>}
+                  {googleLoading ? "…" : "Google"}
                 </Button>
 
-                <p className="pt-7 text-center text-sm text-muted-foreground">
-                  Already growing with AgriTwin?{" "}
-                  <Link to="/login" className="font-semibold text-primary hover:underline">
+                <p className="pt-6 text-[12px] text-muted-foreground">
+                  Have an account?{" "}
+                  <Link to="/login" className="text-primary">
                     Sign in
                   </Link>
                 </p>
               </>
             )}
-          </motion.div>
-        </section>
-      </div>
-    </main>
+        </div>
+      </section>
+    </div>
   );
 }
 

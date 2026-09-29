@@ -1,58 +1,111 @@
-import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { Bot, HeartPulse, LayoutDashboard, Map, Store, User } from "lucide-react";
-import { useEffect } from "react";
-import DarkVeil from "@/components/DarkVeil";
+import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Box, HeartPulse, LayoutDashboard, Menu, Store, User, Wallet, X } from "lucide-react";
+import { BrandMark } from "@/components/agritwin/BrandMark";
+import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { SideNav } from "@/components/SideNav";
-import { useAuth } from "@/hooks/use-auth";
+import { useFarmState } from "@/hooks/use-farm-state";
+import { cropShot } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthedLayout });
 
-const mobileItems = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { to: "/digital-twin", label: "Twin", icon: Map },
-  { to: "/crop-health", label: "Health", icon: HeartPulse },
-  { to: "/markets", label: "Markets", icon: Store },
-  { to: "/assistant", label: "Ask", icon: Bot },
+const NAV = [
+  { to: "/dashboard", label: "Desk", icon: LayoutDashboard },
+  { to: "/digital-twin", label: "Twin", icon: Box },
+  { to: "/crop-health", label: "Disease", icon: HeartPulse },
+  { to: "/markets", label: "Sell", icon: Store },
+  { to: "/financing", label: "Credit", icon: Wallet },
 ] as const;
 
 function AuthedLayout() {
-  const { user, ready } = useAuth();
-  const navigate = useNavigate();
+  const { profile, twin } = useFarmState();
   const location = useLocation();
-
-  useEffect(() => {
-    if (ready && !user) navigate({ to: "/login", replace: true });
-  }, [navigate, ready, user]);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
     return () => document.documentElement.classList.remove("dark");
   }, []);
 
-  if (!ready || !user) {
-    return <main className="dark grid min-h-app place-items-center bg-background text-foreground"><p className="text-sm text-muted-foreground">Preparing your farm…</p></main>;
-  }
-
   return (
-    <div className="dark relative isolate min-h-app bg-background pb-24 text-foreground md:pb-0">
-      <div aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <DarkVeil hueShift={140} noiseIntensity={0} scanlineIntensity={0} speed={0.28} scanlineFrequency={0} warpAmount={0} resolutionScale={0.8} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--background)_72%,transparent),color-mix(in_oklab,var(--background)_92%,transparent))]" />
-      </div>
+    <div className="dark min-h-app bg-background text-foreground pb-20 md:pb-0 selection:bg-primary selection:text-primary-foreground">
       <SideNav />
-      <div className="relative z-10 md:pl-[calc(var(--sidenav-width,15rem)+1.5rem)]">
-        <header className="flex h-16 items-center justify-between px-5 md:px-8">
-          <Link to="/dashboard" className="flex items-center gap-2 font-semibold md:hidden"><span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"><Map className="size-4" /></span>AgriTwin</Link>
-          <div className="hidden md:block" />
-          <Link to="/profile" aria-label="Open farm profile" className="grid size-9 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:text-foreground"><User className="size-4" /></Link>
+
+      <div className="md:pl-[var(--sidenav-width,12.5rem)]">
+        <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-[#16130f]/80 px-3 backdrop-blur-md md:px-6">
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+              className="grid size-8 place-items-center text-muted-foreground hover:text-foreground"
+            >
+              {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+            </button>
+            <Link to="/dashboard" className="flex items-center gap-2">
+              <BrandMark className="size-6" />
+              <span className="font-display text-sm font-semibold">Akilimo</span>
+            </Link>
+          </div>
+
+          <div className="hidden md:flex items-center gap-3 text-[12px]">
+            <img src={cropShot(twin.primaryCrop)} alt="" className="size-8 object-cover" />
+            <span className="text-foreground">{twin.farmName}</span>
+            <span className="num text-primary">{twin.totalAcres} ac</span>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <LanguageSelector variant="button" />
+            <Link to="/profile" aria-label="Open farm profile" className="ml-1 flex items-center gap-2 pl-1">
+              <img src={profile.avatarUrl} alt="" className="size-6 object-cover" />
+              <span className="hidden sm:inline text-[12px]">{profile.fullName.split(" ")[0]}</span>
+            </Link>
+          </div>
         </header>
+
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 top-12 z-40 bg-background p-4 md:hidden">
+            <nav className="space-y-1">
+              {[...NAV, { to: "/profile", label: "Farm", icon: User }].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-2 p-3 text-[13px]"
+                  >
+                    <Icon className="size-3.5" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+
         <Outlet />
       </div>
-      <nav className="fixed inset-x-3 bottom-3 z-30 flex items-center justify-around rounded-2xl border border-border bg-popover/90 p-1.5 shadow-2xl backdrop-blur-2xl md:hidden" aria-label="Main navigation">
-        {mobileItems.map((item) => {
+
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 flex items-stretch justify-around border-t border-border bg-[#16130f] pb-[env(safe-area-inset-bottom)] md:hidden"
+        aria-label="Main"
+      >
+        {NAV.map((item) => {
           const active = location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
           const Icon = item.icon;
-          return <Link key={item.to} to={item.to} className={`flex min-w-14 flex-col items-center gap-1 rounded-xl px-2 py-2 text-[10px] font-medium ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}><Icon className="size-4" />{item.label}</Link>;
+          return (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`flex min-w-0 flex-1 flex-col items-center gap-0.5 py-2 text-[10px] ${
+                active ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <Icon className="size-4" strokeWidth={active ? 2.2 : 1.6} />
+              <span>{item.label}</span>
+            </Link>
+          );
         })}
       </nav>
     </div>

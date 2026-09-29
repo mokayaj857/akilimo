@@ -5,13 +5,15 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --radius-sm: 3px;
+  --radius-md: 5px;
+  --radius-lg: 7px;
+  --radius-xl: 9px;
+  --radius-2xl: 11px;
+  --radius-3xl: 13px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -35,8 +37,6 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
-  --color-paper: var(--paper);
-  --color-ink: var(--ink);
   --color-earth: var(--earth);
   --color-earth-foreground: var(--earth-foreground);
   --color-risk: var(--risk);
@@ -45,39 +45,36 @@
 }
 
 :root {
-  --radius: 1rem;
+  --radius: 0.4rem;
   --app-height: 100vh;
-  /* Warm tactile native palette */
-  --background: oklch(0.985 0.003 60);          /* warm off-white */
-  --foreground: oklch(0.18 0.02 270);           /* near-black */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 270);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 270);
-  --primary: oklch(0.58 0.16 155);              /* rich emerald */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.97 0.005 60);
-  --secondary-foreground: oklch(0.18 0.02 270);
-  --muted: oklch(0.96 0.005 60);
-  --muted-foreground: oklch(0.5 0.02 270);
-  --accent: oklch(0.96 0.03 155);               /* emerald-tinted accent */
-  --accent-foreground: oklch(0.18 0.02 270);
-  --destructive: oklch(0.6 0.22 27);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.7 0.16 155);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.78 0.14 75);
-  --warning-foreground: oklch(0.18 0.02 270);
-  --border: oklch(0.92 0.005 60);
-  --input: oklch(0.92 0.005 60);
-  --ring: oklch(0.58 0.16 155);
-  --paper: oklch(0.98 0.005 60);
-  --ink: oklch(0.15 0.02 270);
-  --earth: oklch(0.72 0.13 79);
-  --earth-foreground: oklch(0.2 0.03 70);
-  --risk: oklch(0.63 0.19 30);
-  --risk-foreground: oklch(0.99 0 0);
-  --sky: oklch(0.7 0.11 225);
+  --background: #14120e;
+  --foreground: #f1eadc;
+  --card: #1c1913;
+  --card-foreground: #f1eadc;
+  --popover: #211e17;
+  --popover-foreground: #f1eadc;
+  --primary: #c9a227;
+  --primary-foreground: #1a160c;
+  --secondary: #252117;
+  --secondary-foreground: #f1eadc;
+  --muted: #252117;
+  --muted-foreground: #9c9484;
+  --accent: #2a261c;
+  --accent-foreground: #f1eadc;
+  --destructive: #c45c3e;
+  --destructive-foreground: #fff6ee;
+  --success: #7d9a4a;
+  --success-foreground: #14120e;
+  --warning: #c9a227;
+  --warning-foreground: #1a160c;
+  --border: rgba(241, 234, 220, 0.1);
+  --input: rgba(241, 234, 220, 0.1);
+  --ring: #c9a227;
+  --earth: #c07a3a;
+  --earth-foreground: #fff6ee;
+  --risk: #c45c3e;
+  --risk-foreground: #fff6ee;
+  --sky: #7d9aaa;
 }
 
 @supports (height: 100lvh) {
@@ -87,68 +84,80 @@
 }
 
 .dark {
-  --background: oklch(0.14 0.015 270);
-  --foreground: oklch(1 0 0);
-  --card: oklch(1 0 0 / 6%);
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.18 0.02 270 / 92%);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.66 0.17 155);
-  --primary-foreground: oklch(0.15 0.02 270);
-  --secondary: oklch(1 0 0 / 8%);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(1 0 0 / 6%);
-  --muted-foreground: oklch(0.99 0.003 60);
-  --accent: oklch(0.66 0.17 155 / 16%);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.65 0.22 27);
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.65 0.16 155);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.75 0.14 75);
-  --warning-foreground: oklch(0.15 0.02 270);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.66 0.17 155);
-  --paper: oklch(1 0 0 / 6%);
-  --ink: oklch(1 0 0);
-  --earth: oklch(0.77 0.13 79);
-  --earth-foreground: oklch(0.17 0.02 70);
-  --risk: oklch(0.68 0.18 30);
-  --risk-foreground: oklch(0.99 0 0);
-  --sky: oklch(0.74 0.11 225);
+  --background: #12100c;
+  --foreground: #f1eadc;
+  --card: #1a1712;
+  --card-foreground: #f1eadc;
+  --popover: #201d16;
+  --popover-foreground: #f1eadc;
+  --primary: #d4af37;
+  --primary-foreground: #1a160c;
+  --secondary: #231f16;
+  --secondary-foreground: #f1eadc;
+  --muted: #231f16;
+  --muted-foreground: #9a9180;
+  --accent: #29251b;
+  --accent-foreground: #f1eadc;
+  --destructive: #c45c3e;
+  --destructive-foreground: #fff6ee;
+  --success: #8aaa55;
+  --success-foreground: #14120e;
+  --warning: #d4af37;
+  --warning-foreground: #1a160c;
+  --border: rgba(241, 234, 220, 0.09);
+  --input: rgba(241, 234, 220, 0.1);
+  --ring: #d4af37;
+  --earth: #c07a3a;
+  --earth-foreground: #fff6ee;
+  --risk: #c45c3e;
+  --risk-foreground: #fff6ee;
+  --sky: #8aadc0;
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  /* Fill the full viewport including iOS safe areas. In standalone PWA mode
-     the home-indicator zone is painted with the <html> background, so html
-     must extend to 100dvh or iOS shows a white bar at the bottom. */
-  html, body {
-    background-color: #0b0a10;
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    background-color: var(--background);
     color: var(--color-foreground);
     min-height: var(--app-height);
     height: 100%;
   }
   body {
     font-family: var(--font-sans);
+    font-feature-settings: "ss01", "tnum";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height: var(--app-height);
-    overscroll-behavior-y: none;
+    background-color: var(--background);
+    background-image:
+      radial-gradient(1200px 500px at 10% -10%, rgba(201, 162, 39, 0.07), transparent 55%),
+      radial-gradient(900px 400px at 100% 0%, rgba(61, 90, 44, 0.18), transparent 50%);
+    background-attachment: fixed;
   }
-  button, a, input, select, textarea { letter-spacing: 0; }
-  /* Hide native number spin */
-  input[type=number]::-webkit-outer-spin-button,
-  input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type=number] { -moz-appearance: textfield; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+  h1,
+  h2,
+  .font-display {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    letter-spacing: 0;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
   }
 }
 
@@ -156,158 +165,108 @@
   .min-h-app {
     min-height: var(--app-height);
   }
-
   .h-app {
     height: var(--app-height);
   }
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+  .shade {
+    background:
+      linear-gradient(180deg, rgba(10, 8, 5, 0.15) 0%, transparent 32%, rgba(10, 8, 5, 0.92) 100%);
+  }
+  .shade-side {
+    background: linear-gradient(90deg, rgba(10, 8, 5, 0.72) 0%, rgba(10, 8, 5, 0.2) 55%, transparent 100%);
+  }
+  .photo {
+    overflow: hidden;
+    isolation: isolate;
+    position: relative;
+  }
+  .photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.04);
+    position: relative;
+    z-index: 0;
+  }
+  .photo::after {
+    z-index: 1;
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: overlay;
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .rule {
+    height: 1px;
+    background: linear-gradient(90deg, var(--primary), transparent 72%);
+  }
+  .glass-panel,
+  .glass-panel-glow {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+  .glass-button {
+    background: var(--secondary);
+    border: 1px solid var(--border);
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .glass-button:hover {
+    background: var(--accent);
+    border-color: color-mix(in srgb, var(--primary) 40%, transparent);
+    transform: none;
+  }
 }
 
-/* Polaroid-ish receipt frame */
-.receipt-frame {
-  background: white;
-  padding: 0.5rem 0.5rem 1.75rem 0.5rem;
-  box-shadow: 0 22px 40px -24px rgba(0,0,0,0.35), 0 6px 14px -8px rgba(0,0,0,0.2);
+html,
+body,
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 162, 39, 0.35) transparent;
 }
-
-/* Liquid-glass surface treatment in dark mode.
-   Adds backdrop blur + an inner highlight to any element using a translucent
-   semantic surface token. Applied globally so existing pages get the look
-   without rewriting every card. */
-.dark .bg-card,
-.dark .bg-popover,
-.dark .bg-secondary,
-.dark .bg-muted,
-.dark .bg-accent {
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 1px 0 0 rgba(0, 0, 0, 0.25);
-}
-
-/* Hide scrollbars app-wide — content still scrolls, the bar is just not
-   painted. Matches native mobile-app feel where users discover scroll by
-   trying it. */
-html, body {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge legacy */
-}
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
 *::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(201, 162, 39, 0.35);
 }
 
-/* ===== Branded Sonner toasts =====
-   Pill-shaped, glassy, swipeable. Loading toasts get a rotating emerald
-   border beam. Sonner provides swipe-to-dismiss out of the box. */
 .ei-toast {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.625rem;
-  padding: 0.625rem 1rem 0.625rem 0.875rem;
-  border-radius: 9999px;
-  background: color-mix(in oklab, #0f0e16 88%, transparent);
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 6px;
+  background: #1c1913;
   color: var(--color-foreground);
   font-family: var(--font-sans);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  line-height: 1.2;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  box-shadow:
-    0 10px 30px -12px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-  width: max-content;
-  max-width: min(92vw, 28rem);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
   margin-inline: auto;
 }
-.ei-toast-title { font-weight: 600; letter-spacing: -0.01em; }
-.ei-toast-desc { color: var(--color-muted-foreground); font-size: 0.78rem; margin-top: 2px; }
-.ei-toast-icon { display: inline-flex; align-items: center; justify-content: center; }
-
-.ei-toast-close {
-  position: absolute !important;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  left: auto !important;
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: var(--color-foreground) !important;
-  opacity: 0;
-  transition: opacity 0.15s ease, background-color 0.15s ease;
+.ei-toast-title {
+  font-weight: 600;
 }
-.ei-toast:hover .ei-toast-close,
-.ei-toast:focus-within .ei-toast-close { opacity: 1; }
-.ei-toast-close:hover { background: rgba(255, 255, 255, 0.16) !important; }
-.ei-toast[data-styled="true"] { padding-right: 2rem; }
-
-/* Status accents */
-.ei-toast-success { border-color: color-mix(in oklab, oklch(0.7 0.18 155) 45%, transparent); }
-.ei-toast-success .ei-toast-icon { color: oklch(0.78 0.18 155); }
-.ei-toast-error {
-  background: var(--color-destructive) !important;
-  color: var(--color-destructive-foreground) !important;
-  border-color: color-mix(in oklab, var(--color-destructive) 72%, black) !important;
-  box-shadow:
-    0 10px 30px -12px color-mix(in oklab, var(--color-destructive) 45%, transparent),
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+.ei-toast-desc {
+  color: var(--color-muted-foreground);
+  font-size: 0.75rem;
 }
-.ei-toast-error .ei-toast-title,
-.ei-toast-error .ei-toast-desc,
-.ei-toast-error .ei-toast-icon {
-  color: var(--color-destructive-foreground) !important;
-}
-.ei-toast-error .ei-toast-close {
-  color: var(--color-destructive-foreground) !important;
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.24) !important;
-}
-.ei-toast-error .ei-toast-close:hover {
-  background: rgba(255, 255, 255, 0.24) !important;
-}
-
-/* Loading toast: rotating emerald border beam */
-.ei-toast-loading {
-  background:
-    linear-gradient(color-mix(in oklab, #0f0e16 92%, transparent), color-mix(in oklab, #0f0e16 92%, transparent)) padding-box,
-    conic-gradient(
-      from var(--beam-angle, 0deg),
-      transparent 0deg,
-      transparent 280deg,
-      oklch(0.78 0.2 155) 320deg,
-      oklch(0.92 0.18 155) 340deg,
-      oklch(0.78 0.2 155) 360deg
-    ) border-box;
-  border: 1.5px solid transparent;
-  animation: ei-beam-rotate 1.6s linear infinite;
-}
-.ei-toast-loading .ei-toast-icon { color: oklch(0.78 0.2 155); }
-
-@property --beam-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-@keyframes ei-beam-rotate {
-  to { --beam-angle: 360deg; }
-}
-/* Fallback for browsers without @property: pulse the border instead */
-@supports not (background: paint(something)) {
-  .ei-toast-loading {
-    animation: ei-beam-pulse 1.6s ease-in-out infinite;
-  }
-  @keyframes ei-beam-pulse {
-    0%, 100% { border-color: oklch(0.7 0.18 155 / 0.4); }
-    50% { border-color: oklch(0.85 0.2 155 / 0.9); }
-  }
-}
-

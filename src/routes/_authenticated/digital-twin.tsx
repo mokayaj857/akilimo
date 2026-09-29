@@ -1,25 +1,36 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Box, Building2, Droplets, Layers3, LocateFixed, MapPinned, Satellite, Tractor } from "lucide-react";
-import { useState } from "react";
-import { FarmPage } from "@/components/agritwin/Page";
-import { Button } from "@/components/ui/button";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Farm3DViewer } from "@/components/agritwin/Farm3DViewer";
+import { useFarmState } from "@/hooks/use-farm-state";
+import { cropShot, SHOT } from "@/lib/agritwin/imagery";
 
-export const Route = createFileRoute("/_authenticated/digital-twin")({ head: () => ({ meta: [{ title: "Digital twin — AgriTwin" }, { name: "description", content: "Explore a living digital representation of your farm, crop zones, water, structures, and sensor readings." }, { property: "og:title", content: "Digital twin — AgriTwin" }, { property: "og:description", content: "Explore your living digital farm model." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }), component: DigitalTwin });
+export const Route = createFileRoute("/_authenticated/digital-twin")({
+  head: () => ({
+    meta: [{ title: "Twin — Akilimo" }],
+  }),
+  component: DigitalTwinRoute,
+});
 
-function DigitalTwin() {
-  const [layer, setLayer] = useState("Crop health");
-  return <FarmPage eyebrow="Farm model" title="Digital twin" description="A living spatial model built from satellite observations, weather, sensor readings, and your updates." action={<div className="flex gap-2"><Button variant="outline" className="rounded-xl"><LocateFixed /> Centre farm</Button><Button className="rounded-xl"><Box /> 3D view</Button></div>}>
-    <div className="grid gap-5 xl:grid-cols-[1fr_18rem]">
-      <section className="relative min-h-[560px] overflow-hidden rounded-2xl border border-border bg-[linear-gradient(145deg,color-mix(in_oklab,var(--primary)_18%,var(--background)),color-mix(in_oklab,var(--earth)_13%,var(--background)))]">
-        <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] [background-size:48px_48px]" />
-        <div className="absolute left-[9%] top-[15%] h-[58%] w-[43%] rotate-[-5deg] rounded-[30%_12%_24%_10%] border-2 border-primary bg-primary/25 shadow-[0_0_50px_color-mix(in_oklab,var(--primary)_20%,transparent)]"><span className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-lg bg-popover/80 px-3 py-1.5 text-xs font-semibold backdrop-blur">Maize · North plot</span></div>
-        <div className="absolute right-[12%] top-[25%] h-[45%] w-[31%] rotate-[7deg] rounded-[12%_30%_18%_28%] border-2 border-earth bg-earth/20"><span className="absolute left-1/2 top-1/2 -translate-x-1/2 rounded-lg bg-popover/80 px-3 py-1.5 text-xs font-semibold backdrop-blur">Beans · East plot</span></div>
-        <Marker className="left-[47%] top-[25%]" icon={Building2} label="Farm house" /><Marker className="left-[58%] top-[58%]" icon={Droplets} label="Water tank" /><Marker className="left-[24%] top-[72%]" icon={Tractor} label="Access road" />
-        <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-popover/85 p-3 backdrop-blur-xl"><div className="flex items-center gap-2 text-xs"><Satellite className="size-4 text-primary" /><span>Satellite updated Sep 14</span></div><div className="flex gap-2">{["Crop health", "Moisture", "Terrain"].map((name) => <Button key={name} size="sm" variant={layer === name ? "default" : "ghost"} onClick={() => setLayer(name)} className="rounded-lg">{name}</Button>)}</div></div>
-      </section>
-      <aside className="space-y-5"><section className="rounded-2xl border border-border bg-card p-5"><div className="flex items-center gap-2"><MapPinned className="size-5 text-primary" /><h2 className="font-semibold">Farm boundary</h2></div><p className="mt-4 text-3xl font-semibold">3.8 acres</p><p className="mt-1 text-xs text-muted-foreground">Perimeter 518 m · Kiambu County</p></section><section className="rounded-2xl border border-border bg-card p-5"><div className="flex items-center gap-2"><Layers3 className="size-5 text-primary" /><h2 className="font-semibold">Farm structure</h2></div>{[["Crop zones", "2"], ["Buildings", "2"], ["Water sources", "1"], ["Access points", "2"]].map(([k, v]) => <div key={k} className="flex justify-between border-b border-border py-3 text-sm last:border-0"><span className="text-muted-foreground">{k}</span><strong>{v}</strong></div>)}</section><Button variant="outline" className="h-11 w-full rounded-xl"><Layers3 /> Edit farm structure</Button></aside>
-    </div>
-  </FarmPage>;
+function DigitalTwinRoute() {
+  const { twin, zones } = useFarmState();
+
+  return (
+    <main className="space-y-0">
+      <div className="photo relative h-44 overflow-hidden md:h-56">
+        <img src={cropShot(twin.primaryCrop) || SHOT.maize} alt="" />
+        <div className="shade absolute inset-0 z-[1]" />
+        <div className="absolute inset-0 z-[2] flex items-end justify-between p-5 md:px-8 md:pb-6">
+          <div>
+            <h1 className="font-display text-4xl font-medium md:text-5xl">Twin</h1>
+            <p className="mt-1 text-[14px]">
+              {twin.primaryCrop} · <span className="num">{twin.totalAcres} ac</span>
+            </p>
+          </div>
+          <Link to="/onboarding" className="border border-white/30 bg-black/40 px-3 py-1.5 text-[12px] backdrop-blur-sm">
+            Remap
+          </Link>
+        </div>
+      </div>
+      <Farm3DViewer twin={twin} zones={zones} />
+    </main>
+  );
 }
-
-function Marker({ className, icon: Icon, label }: { className: string; icon: typeof Building2; label: string }) { return <div className={`absolute ${className} group`}><span className="grid size-9 place-items-center rounded-full bg-popover text-primary shadow-lg ring-2 ring-primary/30"><Icon className="size-4" /></span><span className="absolute left-1/2 top-11 hidden -translate-x-1/2 whitespace-nowrap rounded-lg bg-popover px-2 py-1 text-xs group-hover:block">{label}</span></div>; }

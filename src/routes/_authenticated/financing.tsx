@@ -1,12 +1,75 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck, CalendarClock, CircleDollarSign, Landmark, ShieldCheck, Sparkles } from "lucide-react";
-import { FarmPage, MetricCard, SectionTitle } from "@/components/agritwin/Page";
+import { FarmPage } from "@/components/agritwin/Page";
 import { Button } from "@/components/ui/button";
+import { useFarmState } from "@/hooks/use-farm-state";
+import { lenderShot, SHOT } from "@/lib/agritwin/imagery";
+import { toast } from "sonner";
 
-const offers = [{ lender: "Kiambu Farmers SACCO", product: "Seasonal Input Loan", amount: "KSh 120,000", rate: "12% p.a.", term: "10 months", match: 92 }, { lender: "Agricultural Finance Corp.", product: "Smallholder Development Loan", amount: "KSh 250,000", rate: "10% p.a.", term: "24 months", match: 86 }, { lender: "Kenya Women Microfinance", product: "AgriBiz Loan", amount: "KSh 80,000", rate: "13% p.a.", term: "12 months", match: 78 }];
-export const Route = createFileRoute("/_authenticated/financing")({ head: () => ({ meta: [{ title: "Farm financing — AgriTwin" }, { name: "description", content: "Discover relevant SACCO and agricultural loan options matched to your farm profile." }, { property: "og:title", content: "Farm financing — AgriTwin" }, { property: "og:description", content: "Financing options matched to your farm." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }), component: Financing });
-function Financing() { return <FarmPage eyebrow="AgriFin" title="Financing" description="Relevant agricultural finance matched using your farm size, crops, production stage, and digital farm history.">
-  <div className="grid gap-4 sm:grid-cols-3"><MetricCard icon={ShieldCheck} label="Finance readiness" value="Good" detail="8 of 10 profile items complete" /><MetricCard icon={CircleDollarSign} label="Estimated range" value="KSh 80k–250k" detail="Across your current matches" tone="earth" /><MetricCard icon={CalendarClock} label="Next harvest" value="24 days" detail="Projected from planting date" tone="sky" /></div>
-  <div className="mt-7 grid gap-6 xl:grid-cols-[1fr_19rem]"><div><SectionTitle title="Recommended for your farm" detail="3 suitable options" /><div className="space-y-4">{offers.map((o, i) => <article key={o.product} className="rounded-2xl border border-border bg-card p-5"><div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex gap-4"><span className={`grid size-11 shrink-0 place-items-center rounded-xl ${i === 0 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}><Landmark className="size-5" /></span><div><div className="flex flex-wrap items-center gap-2"><h2 className="font-semibold">{o.product}</h2>{i === 0 && <span className="rounded-full bg-primary/15 px-2 py-1 text-[10px] font-semibold text-primary">BEST MATCH</span>}</div><p className="mt-1 text-sm text-muted-foreground">{o.lender}</p></div></div><div className="sm:text-right"><p className="text-xl font-semibold">{o.amount}</p><p className="text-xs text-primary">{o.match}% profile match</p></div></div><div className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4 sm:grid-cols-3"><div><p className="text-xs text-muted-foreground">Interest</p><p className="mt-1 text-sm font-medium">{o.rate}</p></div><div><p className="text-xs text-muted-foreground">Term</p><p className="mt-1 text-sm font-medium">{o.term}</p></div><Button variant="outline" className="col-span-2 rounded-xl sm:col-span-1">View details</Button></div></article>)}</div></div>
-  <aside className="h-fit rounded-2xl border border-primary/30 bg-primary/10 p-5"><Sparkles className="size-6 text-primary" /><h2 className="mt-4 font-semibold">Why these match</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Your 3.8-acre mapped farm, maize crop, healthy vegetation trend, and completed profile strengthen your eligibility.</p><div className="mt-5 space-y-3">{["Farm boundary verified", "Crop cycle recorded", "Contact verified", "Production history needed"].map((x, i) => <p key={x} className="flex items-center gap-2 text-sm"><BadgeCheck className={`size-4 ${i === 3 ? "text-muted-foreground" : "text-primary"}`} />{x}</p>)}</div><Button className="mt-6 w-full rounded-xl">Improve my profile</Button></aside></div>
- </FarmPage>; }
+export const Route = createFileRoute("/_authenticated/financing")({
+  head: () => ({
+    meta: [{ title: "Credit — Akilimo" }],
+  }),
+  component: FinancingRoute,
+});
+
+function FinancingRoute() {
+  const { saccoOptions, creditReadinessScore, twin } = useFarmState();
+  const ranked = [...saccoOptions].sort((a, b) => b.profileMatchPercent - a.profileMatchPercent);
+  const best = ranked.find((o) => o.isRecommended) || ranked[0];
+
+  return (
+    <FarmPage title="Credit" bleed>
+      <div className="photo relative h-[52vh] min-h-[320px] overflow-hidden md:h-[58vh]">
+        <img src={SHOT.farmer} alt="" className="object-[center_80%]" />
+        <div className="shade absolute inset-0 z-[1]" />
+        <div className="absolute inset-0 z-[2] flex flex-col justify-end p-5 pb-24 md:p-10 md:pb-10">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-primary">Twin score</p>
+          <div className="mt-2 flex items-end justify-between gap-4">
+            <div>
+              <h1 className="font-display text-5xl font-medium leading-none md:text-7xl">Credit</h1>
+              <p className="mt-3 text-[14px] text-foreground/80">
+                {twin.totalAcres} ac · {twin.primaryCrop}
+              </p>
+            </div>
+            <p className="num text-6xl leading-none text-primary md:text-8xl">{creditReadinessScore}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-3 px-4 pt-5 md:px-7">
+        {ranked.map((opt) => (
+          <div
+            key={opt.id}
+            className={`photo relative h-28 overflow-hidden md:h-32 ${opt.isRecommended ? "ring-1 ring-primary" : ""}`}
+          >
+            <img src={lenderShot(opt.institutionType)} alt="" className="opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#14120e] via-[#14120e]/88 to-[#14120e]/45" />
+            <div className="absolute inset-0 flex items-center justify-between gap-3 p-4 md:px-6">
+              <div className="min-w-0">
+                <p className="truncate text-[16px] md:text-[18px]">
+                  {opt.institutionName}
+                  {opt.isRecommended && <span className="ml-2 text-[11px] uppercase tracking-widest text-primary">Best</span>}
+                </p>
+                <p className="mt-1 text-[12px] text-muted-foreground">
+                  {opt.institutionType}
+                  {opt === best ? " · from your twin" : ""}
+                </p>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="num text-[18px] md:text-2xl">{opt.maxAmountKes.toLocaleString()}</p>
+                <Button
+                  size="sm"
+                  className="mt-2"
+                  variant={opt.isRecommended ? "default" : "outline"}
+                  onClick={() => toast.success(`Sent to ${opt.institutionName}`)}
+                >
+                  Apply
+                </Button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </FarmPage>
+  );
+}

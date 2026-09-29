@@ -11,23 +11,30 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedTripsRouteImport } from './routes/_authenticated/trips'
+import { Route as AuthenticatedSatelliteRouteImport } from './routes/_authenticated/satellite'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPoliciesRouteImport } from './routes/_authenticated/policies'
 import { Route as AuthenticatedMarketsRouteImport } from './routes/_authenticated/markets'
+import { Route as AuthenticatedKnowledgeGraphRouteImport } from './routes/_authenticated/knowledge-graph'
+import { Route as AuthenticatedIotRouteImport } from './routes/_authenticated/iot'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedFinancingRouteImport } from './routes/_authenticated/financing'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedExpensesRouteImport } from './routes/_authenticated/expenses'
 import { Route as AuthenticatedDigitalTwinRouteImport } from './routes/_authenticated/digital-twin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCropHealthRouteImport } from './routes/_authenticated/crop-health'
+import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAskAiRouteImport } from './routes/_authenticated/ask-ai'
 import { Route as AuthenticatedApprovalsRouteImport } from './routes/_authenticated/approvals'
+import { Route as AuthenticatedAlertsRouteImport } from './routes/_authenticated/alerts'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedReportsNewRouteImport } from './routes/_authenticated/reports.new'
@@ -48,6 +55,11 @@ const SignupRoute = SignupRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -74,6 +86,11 @@ const AuthenticatedTripsRoute = AuthenticatedTripsRouteImport.update({
   path: '/trips',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedSatelliteRoute = AuthenticatedSatelliteRouteImport.update({
+  id: '/satellite',
+  path: '/satellite',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -92,6 +109,22 @@ const AuthenticatedPoliciesRoute = AuthenticatedPoliciesRouteImport.update({
 const AuthenticatedMarketsRoute = AuthenticatedMarketsRouteImport.update({
   id: '/markets',
   path: '/markets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedKnowledgeGraphRoute =
+  AuthenticatedKnowledgeGraphRouteImport.update({
+    id: '/knowledge-graph',
+    path: '/knowledge-graph',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedIotRoute = AuthenticatedIotRouteImport.update({
+  id: '/iot',
+  path: '/iot',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedFinancingRoute = AuthenticatedFinancingRouteImport.update({
@@ -125,6 +158,11 @@ const AuthenticatedCropHealthRoute = AuthenticatedCropHealthRouteImport.update({
   path: '/crop-health',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
   id: '/ask-ai',
   path: '/ask-ai',
@@ -133,6 +171,11 @@ const AuthenticatedAskAiRoute = AuthenticatedAskAiRouteImport.update({
 const AuthenticatedApprovalsRoute = AuthenticatedApprovalsRouteImport.update({
   id: '/approvals',
   path: '/approvals',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAlertsRoute = AuthenticatedAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -200,21 +243,28 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/alerts': typeof AuthenticatedAlertsRoute
   '/approvals': typeof AuthenticatedApprovalsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
+  '/assistant': typeof AuthenticatedAssistantRoute
   '/crop-health': typeof AuthenticatedCropHealthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/digital-twin': typeof AuthenticatedDigitalTwinRoute
   '/expenses': typeof AuthenticatedExpensesRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/financing': typeof AuthenticatedFinancingRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/iot': typeof AuthenticatedIotRoute
+  '/knowledge-graph': typeof AuthenticatedKnowledgeGraphRoute
   '/markets': typeof AuthenticatedMarketsRoute
   '/policies': typeof AuthenticatedPoliciesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reports': typeof AuthenticatedReportsRouteWithChildren
+  '/satellite': typeof AuthenticatedSatelliteRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/admin/reimburse': typeof AuthenticatedAdminReimburseRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -231,20 +281,27 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/alerts': typeof AuthenticatedAlertsRoute
   '/approvals': typeof AuthenticatedApprovalsRoute
   '/ask-ai': typeof AuthenticatedAskAiRoute
+  '/assistant': typeof AuthenticatedAssistantRoute
   '/crop-health': typeof AuthenticatedCropHealthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/digital-twin': typeof AuthenticatedDigitalTwinRoute
   '/expenses': typeof AuthenticatedExpensesRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/financing': typeof AuthenticatedFinancingRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/iot': typeof AuthenticatedIotRoute
+  '/knowledge-graph': typeof AuthenticatedKnowledgeGraphRoute
   '/markets': typeof AuthenticatedMarketsRoute
   '/policies': typeof AuthenticatedPoliciesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/reports': typeof AuthenticatedReportsRouteWithChildren
+  '/satellite': typeof AuthenticatedSatelliteRoute
   '/trips': typeof AuthenticatedTripsRoute
   '/admin/reimburse': typeof AuthenticatedAdminReimburseRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -263,21 +320,28 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/_authenticated/alerts': typeof AuthenticatedAlertsRoute
   '/_authenticated/approvals': typeof AuthenticatedApprovalsRoute
   '/_authenticated/ask-ai': typeof AuthenticatedAskAiRoute
+  '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/crop-health': typeof AuthenticatedCropHealthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/digital-twin': typeof AuthenticatedDigitalTwinRoute
   '/_authenticated/expenses': typeof AuthenticatedExpensesRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRouteWithChildren
   '/_authenticated/financing': typeof AuthenticatedFinancingRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/iot': typeof AuthenticatedIotRoute
+  '/_authenticated/knowledge-graph': typeof AuthenticatedKnowledgeGraphRoute
   '/_authenticated/markets': typeof AuthenticatedMarketsRoute
   '/_authenticated/policies': typeof AuthenticatedPoliciesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRouteWithChildren
+  '/_authenticated/satellite': typeof AuthenticatedSatelliteRoute
   '/_authenticated/trips': typeof AuthenticatedTripsRoute
   '/_authenticated/admin/reimburse': typeof AuthenticatedAdminReimburseRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
@@ -296,21 +360,28 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/admin'
+    | '/alerts'
     | '/approvals'
     | '/ask-ai'
+    | '/assistant'
     | '/crop-health'
     | '/dashboard'
     | '/digital-twin'
     | '/expenses'
     | '/finance'
     | '/financing'
+    | '/history'
+    | '/iot'
+    | '/knowledge-graph'
     | '/markets'
     | '/policies'
     | '/profile'
     | '/reports'
+    | '/satellite'
     | '/trips'
     | '/admin/reimburse'
     | '/admin/reports'
@@ -327,20 +398,27 @@ export interface FileRouteTypes {
     | '/'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/reset-password'
     | '/signup'
+    | '/alerts'
     | '/approvals'
     | '/ask-ai'
+    | '/assistant'
     | '/crop-health'
     | '/dashboard'
     | '/digital-twin'
     | '/expenses'
     | '/finance'
     | '/financing'
+    | '/history'
+    | '/iot'
+    | '/knowledge-graph'
     | '/markets'
     | '/policies'
     | '/profile'
     | '/reports'
+    | '/satellite'
     | '/trips'
     | '/admin/reimburse'
     | '/admin/reports'
@@ -358,21 +436,28 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/forgot-password'
     | '/login'
+    | '/onboarding'
     | '/reset-password'
     | '/signup'
     | '/_authenticated/admin'
+    | '/_authenticated/alerts'
     | '/_authenticated/approvals'
     | '/_authenticated/ask-ai'
+    | '/_authenticated/assistant'
     | '/_authenticated/crop-health'
     | '/_authenticated/dashboard'
     | '/_authenticated/digital-twin'
     | '/_authenticated/expenses'
     | '/_authenticated/finance'
     | '/_authenticated/financing'
+    | '/_authenticated/history'
+    | '/_authenticated/iot'
+    | '/_authenticated/knowledge-graph'
     | '/_authenticated/markets'
     | '/_authenticated/policies'
     | '/_authenticated/profile'
     | '/_authenticated/reports'
+    | '/_authenticated/satellite'
     | '/_authenticated/trips'
     | '/_authenticated/admin/reimburse'
     | '/_authenticated/admin/reports'
@@ -391,6 +476,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
 }
@@ -409,6 +495,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -446,6 +539,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTripsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/satellite': {
+      id: '/_authenticated/satellite'
+      path: '/satellite'
+      fullPath: '/satellite'
+      preLoaderRoute: typeof AuthenticatedSatelliteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/reports': {
       id: '/_authenticated/reports'
       path: '/reports'
@@ -472,6 +572,27 @@ declare module '@tanstack/react-router' {
       path: '/markets'
       fullPath: '/markets'
       preLoaderRoute: typeof AuthenticatedMarketsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/knowledge-graph': {
+      id: '/_authenticated/knowledge-graph'
+      path: '/knowledge-graph'
+      fullPath: '/knowledge-graph'
+      preLoaderRoute: typeof AuthenticatedKnowledgeGraphRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/iot': {
+      id: '/_authenticated/iot'
+      path: '/iot'
+      fullPath: '/iot'
+      preLoaderRoute: typeof AuthenticatedIotRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/financing': {
@@ -516,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCropHealthRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/assistant': {
+      id: '/_authenticated/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AuthenticatedAssistantRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/ask-ai': {
       id: '/_authenticated/ask-ai'
       path: '/ask-ai'
@@ -528,6 +656,13 @@ declare module '@tanstack/react-router' {
       path: '/approvals'
       fullPath: '/approvals'
       preLoaderRoute: typeof AuthenticatedApprovalsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/alerts': {
+      id: '/_authenticated/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AuthenticatedAlertsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin': {
@@ -670,35 +805,47 @@ const AuthenticatedReportsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  AuthenticatedAlertsRoute: typeof AuthenticatedAlertsRoute
   AuthenticatedApprovalsRoute: typeof AuthenticatedApprovalsRoute
   AuthenticatedAskAiRoute: typeof AuthenticatedAskAiRoute
+  AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedCropHealthRoute: typeof AuthenticatedCropHealthRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDigitalTwinRoute: typeof AuthenticatedDigitalTwinRoute
   AuthenticatedExpensesRoute: typeof AuthenticatedExpensesRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRouteWithChildren
   AuthenticatedFinancingRoute: typeof AuthenticatedFinancingRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedIotRoute: typeof AuthenticatedIotRoute
+  AuthenticatedKnowledgeGraphRoute: typeof AuthenticatedKnowledgeGraphRoute
   AuthenticatedMarketsRoute: typeof AuthenticatedMarketsRoute
   AuthenticatedPoliciesRoute: typeof AuthenticatedPoliciesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRouteWithChildren
+  AuthenticatedSatelliteRoute: typeof AuthenticatedSatelliteRoute
   AuthenticatedTripsRoute: typeof AuthenticatedTripsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  AuthenticatedAlertsRoute: AuthenticatedAlertsRoute,
   AuthenticatedApprovalsRoute: AuthenticatedApprovalsRoute,
   AuthenticatedAskAiRoute: AuthenticatedAskAiRoute,
+  AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedCropHealthRoute: AuthenticatedCropHealthRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDigitalTwinRoute: AuthenticatedDigitalTwinRoute,
   AuthenticatedExpensesRoute: AuthenticatedExpensesRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRouteWithChildren,
   AuthenticatedFinancingRoute: AuthenticatedFinancingRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedIotRoute: AuthenticatedIotRoute,
+  AuthenticatedKnowledgeGraphRoute: AuthenticatedKnowledgeGraphRoute,
   AuthenticatedMarketsRoute: AuthenticatedMarketsRoute,
   AuthenticatedPoliciesRoute: AuthenticatedPoliciesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRouteWithChildren,
+  AuthenticatedSatelliteRoute: AuthenticatedSatelliteRoute,
   AuthenticatedTripsRoute: AuthenticatedTripsRoute,
 }
 
@@ -711,6 +858,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
 }

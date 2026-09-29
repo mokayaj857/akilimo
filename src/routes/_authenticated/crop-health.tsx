@@ -1,14 +1,46 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Camera, CloudRain, Droplets, Leaf, ShieldAlert, ThermometerSun, Upload } from "lucide-react";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { FarmPage, MetricCard, SectionTitle } from "@/components/agritwin/Page";
+import { FarmPage } from "@/components/agritwin/Page";
 import { Button } from "@/components/ui/button";
+import { useFarmState } from "@/hooks/use-farm-state";
+import { SHOT } from "@/lib/agritwin/imagery";
+import { toast } from "sonner";
 
-const data = [{ w: "Aug 4", ndvi: .61, ndre: .36 }, { w: "Aug 11", ndvi: .67, ndre: .41 }, { w: "Aug 18", ndvi: .72, ndre: .47 }, { w: "Aug 25", ndvi: .76, ndre: .52 }, { w: "Sep 1", ndvi: .79, ndre: .55 }, { w: "Sep 8", ndvi: .77, ndre: .53 }, { w: "Sep 15", ndvi: .74, ndre: .49 }];
-export const Route = createFileRoute("/_authenticated/crop-health")({ head: () => ({ meta: [{ title: "Crop health — AgriTwin" }, { name: "description", content: "Track vegetation health, environmental stress, and early disease risk on your farm." }, { property: "og:title", content: "Crop health — AgriTwin" }, { property: "og:description", content: "Early crop risk and vegetation intelligence." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }), component: CropHealth });
-function CropHealth() { return <FarmPage eyebrow="Early warning" title="Crop health" description="Satellite vegetation signals and field conditions help spot abnormal crop stress before symptoms spread." action={<Button className="rounded-xl"><Camera /> Diagnose a crop</Button>}>
-  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><MetricCard icon={Leaf} label="NDVI" value="0.74" detail="Healthy, down 0.03 this week" /><MetricCard icon={ThermometerSun} label="Temperature" value="24°C" detail="Favourable for maize growth" tone="earth" /><MetricCard icon={Droplets} label="Humidity" value="78%" detail="Elevated overnight" tone="sky" /><MetricCard icon={CloudRain} label="Recent rainfall" value="32 mm" detail="Past seven days" tone="sky" /></div>
-  <div className="mt-6 grid gap-5 xl:grid-cols-[1.45fr_1fr]"><section className="rounded-2xl border border-border bg-card p-5"><SectionTitle title="Vegetation trend" detail="NDVI & NDRE · 6 weeks" /><div className="h-72"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data}><defs><linearGradient id="ndvi" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={.35}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="var(--border)" vertical={false}/><XAxis dataKey="w" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false}/><YAxis domain={[0,1]} tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} axisLine={false}/><Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}/><Area type="monotone" dataKey="ndvi" stroke="var(--primary)" fill="url(#ndvi)" strokeWidth={2}/><Area type="monotone" dataKey="ndre" stroke="var(--earth)" fill="transparent" strokeWidth={2}/></AreaChart></ResponsiveContainer></div></section>
-  <section className="rounded-2xl border border-risk/30 bg-risk/10 p-5"><ShieldAlert className="size-6 text-risk" /><p className="mt-5 text-xs font-semibold uppercase text-risk">Moderate risk · next 7 days</p><h2 className="mt-2 text-xl font-semibold">Northern corn leaf blight</h2><p className="mt-3 text-sm leading-relaxed text-muted-foreground">High humidity, recent rain, and a slight NDRE decline create favourable disease conditions in the north plot.</p><div className="mt-5 border-t border-risk/20 pt-4"><p className="text-sm font-medium">Recommended now</p><ul className="mt-2 space-y-2 text-sm text-muted-foreground"><li>• Inspect lower leaves in the north zone</li><li>• Avoid overhead irrigation after 4 PM</li><li>• Photograph any grey-green lesions</li></ul></div></section></div>
-  <section className="mt-6 rounded-2xl border border-dashed border-border bg-card/50 p-7 text-center"><Upload className="mx-auto size-7 text-primary" /><h2 className="mt-3 font-semibold">See symptoms already?</h2><p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">Take a clear crop photo and AgriTwin will identify likely disease and recommend locally relevant next steps.</p><Button variant="outline" className="mt-4 rounded-xl">Upload crop image</Button></section>
- </FarmPage>; }
+export const Route = createFileRoute("/_authenticated/crop-health")({
+  head: () => ({
+    meta: [{ title: "Disease — Akilimo" }],
+  }),
+  component: CropHealthRoute,
+});
+
+function CropHealthRoute() {
+  const { diseasePrediction, twin } = useFarmState();
+  const treat = diseasePrediction.recommendedActions.pcpbApprovedInputs[0];
+  const name = diseasePrediction.diseaseName.split("(")[0].trim();
+
+  return (
+    <FarmPage title="Watch" bleed>
+      <div className="photo relative h-[62vh] min-h-[360px] overflow-hidden md:h-[70vh]">
+        <img src={SHOT.maizeLeaf} alt="" />
+        <div className="shade absolute inset-0 z-[1]" />
+        <div className="absolute inset-0 z-[2] flex flex-col justify-between p-5 pb-24 md:p-10 md:pb-10">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-primary">{twin.primaryCrop}</p>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-risk">Before the leaf shows it</p>
+            <p className="num mt-2 text-6xl text-risk md:text-8xl">{diseasePrediction.riskPercentage}</p>
+            <h1 className="font-display mt-3 text-4xl font-medium leading-[0.95] md:text-6xl">{name}</h1>
+          </div>
+        </div>
+      </div>
+      {treat && (
+        <div className="mx-4 mt-4 flex flex-col gap-3 border border-border bg-card p-4 sm:flex-row sm:items-center sm:justify-between md:mx-7">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Spray window</p>
+            <p className="mt-1 text-[16px]">{treat.commercialName}</p>
+            <p className="num mt-1 text-[12px] text-muted-foreground">{treat.dosagePer20LKnapsack}</p>
+          </div>
+          <Button onClick={() => toast.success("Spray logged.")}>Log spray</Button>
+        </div>
+      )}
+    </FarmPage>
+  );
+}

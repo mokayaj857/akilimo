@@ -52,20 +52,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0b0a10" },
+      { name: "theme-color", content: "#14120e" },
       // PWA / iOS home-screen
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
-      { name: "apple-mobile-web-app-title", content: "AgriTwin" },
-      { name: "application-name", content: "AgriTwin" },
+      { name: "apple-mobile-web-app-title", content: "Akilimo" },
+      { name: "application-name", content: "Akilimo" },
       { name: "format-detection", content: "telephone=no" },
-      { title: "AgriTwin — Your farm, understood" },
-      { name: "description", content: "AI-powered digital farm twin, crop health, market intelligence, and agricultural finance for African farmers." },
-      { property: "og:title", content: "AgriTwin — Your farm, understood" },
-      { name: "twitter:title", content: "AgriTwin — Your farm, understood" },
-      { property: "og:description", content: "See crop risk earlier, compare markets, and find finance with an intelligent digital twin of your farm." },
-      { name: "twitter:description", content: "See crop risk earlier, compare markets, and find finance with an intelligent digital twin of your farm." },
+      { title: "Akilimo" },
+      { name: "description", content: "Map the farm. Watch disease. Sell at the best market. Get scored for SACCO and bank credit." },
+      { property: "og:title", content: "Akilimo" },
+      { name: "twitter:title", content: "Akilimo" },
+      { property: "og:description", content: "Map the farm. Watch disease. Sell at the best market. Get scored for SACCO and bank credit." },
+      { name: "twitter:description", content: "Map the farm. Watch disease. Sell at the best market. Get scored for SACCO and bank credit." },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
     ],
@@ -77,7 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -136,6 +139,9 @@ function AuthBridge() {
   return null;
 }
 
+import { LanguageProvider } from "@/hooks/use-language";
+import { FarmStateProvider } from "@/hooks/use-farm-state";
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -168,28 +174,32 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthBridge />
-      <Outlet />
-      <Toaster
-        position="top-center"
-        closeButton
-        swipeDirections={["left", "right", "top"]}
-        offset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
-        mobileOffset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
-        toastOptions={{
-          unstyled: true,
-          classNames: {
-            toast: "ei-toast",
-            title: "ei-toast-title",
-            description: "ei-toast-desc",
-            icon: "ei-toast-icon",
-            closeButton: "ei-toast-close",
-            loading: "ei-toast-loading",
-            success: "ei-toast-success",
-            error: "ei-toast-error",
-          },
-        }}
-      />
+      <LanguageProvider>
+        <FarmStateProvider>
+          <AuthBridge />
+          <Outlet />
+          <Toaster
+            position="top-center"
+            closeButton
+            swipeDirections={["left", "right", "top"]}
+            offset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+            mobileOffset={{ top: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+            toastOptions={{
+              unstyled: true,
+              classNames: {
+                toast: "ei-toast",
+                title: "ei-toast-title",
+                description: "ei-toast-desc",
+                icon: "ei-toast-icon",
+                closeButton: "ei-toast-close",
+                loading: "ei-toast-loading",
+                success: "ei-toast-success",
+                error: "ei-toast-error",
+              },
+            }}
+          />
+        </FarmStateProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }

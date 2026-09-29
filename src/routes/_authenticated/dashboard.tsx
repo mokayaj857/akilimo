@@ -1,32 +1,77 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { ArrowRight, CloudRain, Droplets, Leaf, ShieldAlert, Sprout, Store, Wallet } from "lucide-react";
-import { FarmPage, MetricCard, SectionTitle } from "@/components/agritwin/Page";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/use-auth";
+import { ArrowRight } from "lucide-react";
+import { useFarmState } from "@/hooks/use-farm-state";
+import { cropShot, marketShot, SHOT } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  head: () => ({ meta: [{ title: "Farm overview — AgriTwin" }, { name: "description", content: "Monitor crop health, weather, markets, and farm finance from your AgriTwin overview." }, { property: "og:title", content: "Farm overview — AgriTwin" }, { property: "og:description", content: "Your farm intelligence overview." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
-  component: Dashboard,
+  head: () => ({
+    meta: [{ title: "Desk — Akilimo" }],
+  }),
+  component: DashboardPage,
 });
 
-function Dashboard() {
-  const { user } = useAuth();
-  const name = (user?.user_metadata?.full_name || "Farmer").split(" ")[0];
-  return <FarmPage eyebrow="Kijani Farm · Kiambu" title={`Good morning, ${name}`} description="Your maize is in the vegetative stage. AgriTwin is watching crop stress, weather, and market movement across your farm." action={<Button asChild className="h-10 rounded-xl"><Link to="/digital-twin">Open digital twin <ArrowRight /></Link></Button>}>
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><MetricCard icon={Leaf} label="Crop health" value="82 / 100" detail="NDVI is stable this week" /><MetricCard icon={ShieldAlert} label="Disease risk" value="Moderate" detail="Maize leaf blight conditions" tone="risk" /><MetricCard icon={CloudRain} label="Rain forecast" value="18 mm" detail="Expected in the next 3 days" tone="sky" /><MetricCard icon={Droplets} label="Soil moisture" value="61%" detail="Good across the east plot" tone="earth" /></div>
-    <div className="mt-7 grid gap-5 xl:grid-cols-[1.45fr_1fr]">
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="flex items-center justify-between border-b border-border p-5"><div><p className="text-xs font-medium text-primary">DIGITAL TWIN</p><h2 className="mt-1 text-lg font-semibold">Kijani Farm</h2></div><span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-medium text-primary">Live</span></div>
-        <div className="relative aspect-[16/8] overflow-hidden bg-[radial-gradient(circle_at_30%_40%,color-mix(in_oklab,var(--primary)_32%,transparent),transparent_28%),linear-gradient(135deg,color-mix(in_oklab,var(--earth)_22%,var(--background)),var(--background))]">
-          <div className="absolute left-[12%] top-[18%] h-[58%] w-[45%] rotate-[-5deg] rounded-[35%_12%_28%_15%] border-2 border-primary bg-primary/20" /><div className="absolute right-[15%] top-[30%] h-[42%] w-[26%] rotate-6 rounded-[18%_38%_12%_30%] border border-earth bg-earth/20" /><div className="absolute left-[47%] top-[46%] size-4 rounded-full bg-sky ring-4 ring-sky/20" />
-          <div className="absolute bottom-4 left-4 rounded-xl border border-border bg-popover/85 px-3 py-2 text-xs backdrop-blur"><span className="text-muted-foreground">Mapped area</span><strong className="ml-2">3.8 acres</strong></div>
-        </div>
-      </motion.section>
-      <div className="space-y-5"><section className="rounded-2xl border border-risk/30 bg-risk/10 p-5"><div className="flex items-start gap-3"><ShieldAlert className="mt-0.5 size-5 text-risk" /><div><p className="text-xs font-semibold uppercase text-risk">Early warning</p><h2 className="mt-1 font-semibold">Leaf blight risk is rising</h2><p className="mt-2 text-sm leading-relaxed text-muted-foreground">Humidity and rainfall patterns may favour disease development in the north maize zone.</p><Button asChild variant="outline" className="mt-4 h-9 rounded-xl"><Link to="/crop-health">Review risk</Link></Button></div></div></section>
-      <section className="rounded-2xl border border-border bg-card p-5"><SectionTitle title="Today’s opportunities" /><Opportunity icon={Store} title="Sell maize in Nairobi" detail="KSh 4,650 / 90 kg · 8% above Thika" /><Opportunity icon={Wallet} title="SACCO match ready" detail="Up to KSh 120,000 based on farm profile" /></section></div>
-    </div>
-  </FarmPage>;
-}
+function DashboardPage() {
+  const { profile, twin, diseasePrediction, markets, saccoOptions, creditReadinessScore } = useFarmState();
+  const sell = markets.find((m) => m.isTopRecommendation) || markets[0];
+  const lender = saccoOptions.find((l) => l.isRecommended) || saccoOptions[0];
+  const first = (profile.fullName || "Farmer").split(" ")[0];
 
-function Opportunity({ icon: Icon, title, detail }: { icon: typeof Store; title: string; detail: string }) { return <div className="flex gap-3 border-t border-border py-4 first:border-0 first:pt-0 last:pb-0"><span className="grid size-9 shrink-0 place-items-center rounded-xl bg-accent text-primary"><Icon className="size-4" /></span><div><p className="text-sm font-medium">{title}</p><p className="mt-1 text-xs text-muted-foreground">{detail}</p></div></div>; }
+  return (
+    <main className="mx-auto w-full max-w-[1120px] px-4 pb-8 pt-4 md:px-7">
+      {!twin.mapped && (
+        <Link to="/onboarding" className="mb-4 block border border-primary/40 bg-primary/10 p-3 text-[13px]">
+          Map the farm first →
+        </Link>
+      )}
+
+      <Link
+        to="/digital-twin"
+        className="photo relative block h-[46vh] min-h-[300px] overflow-hidden md:h-[54vh]"
+      >
+        <img src={cropShot(twin.primaryCrop)} alt="" />
+        <div className="shade absolute inset-0 z-[1]" />
+        <div className="absolute inset-0 z-[2] flex flex-col justify-end p-5 pb-24 md:p-8 md:pb-8">
+          <p className="text-[12px] uppercase tracking-[0.2em] text-primary">{twin.farmName}</p>
+          <h1 className="font-display mt-1 text-5xl font-medium leading-[0.9] md:text-7xl">{first}</h1>
+          <p className="mt-4 num text-[15px] text-foreground/90">
+            {twin.totalAcres} ac · {twin.primaryCrop}
+          </p>
+        </div>
+      </Link>
+
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <Link to="/crop-health" className="photo group relative h-56 overflow-hidden md:h-72">
+          <img src={SHOT.maizeLeaf} alt="" className="transition duration-500 group-hover:scale-105" />
+          <div className="shade absolute inset-0 z-[1]" />
+          <div className="absolute inset-0 z-[2] flex flex-col justify-end p-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Watch</p>
+            <p className="font-display text-3xl text-risk">{diseasePrediction.riskLevel}</p>
+            <p className="mt-1 flex items-center gap-1 text-[13px]">
+              Spray window <ArrowRight className="size-3" />
+            </p>
+          </div>
+        </Link>
+
+        <Link to="/markets" className="photo group relative h-56 overflow-hidden md:h-72">
+          <img src={marketShot(sell.town)} alt="" className="transition duration-500 group-hover:scale-105" />
+          <div className="shade absolute inset-0 z-[1]" />
+          <div className="absolute inset-0 z-[2] flex flex-col justify-end p-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Sell</p>
+            <p className="font-display text-3xl">{sell.town.split(" ")[0]}</p>
+            <p className="num mt-1 text-[15px]">KES {sell.netRevenuePerBag.toLocaleString()}</p>
+          </div>
+        </Link>
+
+        <Link to="/financing" className="photo group relative h-56 overflow-hidden md:h-72">
+          <img src={SHOT.hands} alt="" className="transition duration-500 group-hover:scale-105" />
+          <div className="shade absolute inset-0 z-[1]" />
+          <div className="absolute inset-0 z-[2] flex flex-col justify-end p-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Credit</p>
+            <p className="num text-4xl">{creditReadinessScore}</p>
+            <p className="mt-1 text-[13px]">{lender.institutionType}</p>
+          </div>
+        </Link>
+      </div>
+    </main>
+  );
+}

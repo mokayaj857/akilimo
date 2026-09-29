@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authenticated/ask-ai")({
+export const Route = createFileRoute("/_authenticated/knowledge-graph")({
   beforeLoad: () => {
     throw redirect({ to: "/dashboard" });
   },

@@ -1,26 +1,86 @@
 import type { LucideIcon } from "lucide-react";
+import type React from "react";
 
-export function FarmPage({ eyebrow, title, description, action, children }: { eyebrow: string; title: string; description: string; action?: React.ReactNode; children: React.ReactNode }) {
+export function FarmPage({
+  title,
+  action,
+  children,
+  bleed,
+}: {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+  bleed?: boolean;
+}) {
+  if (bleed) {
+    return <main className="mx-auto w-full max-w-[1120px] pb-10">{children}</main>;
+  }
+
   return (
-    <main className="mx-auto w-full max-w-7xl px-5 pb-12 md:px-8">
-      <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-        <div>
-          <p className="text-xs font-semibold uppercase text-primary">{eyebrow}</p>
-          <h1 className="mt-2 text-3xl font-semibold md:text-4xl">{title}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">{description}</p>
-        </div>
-        {action}
+    <main className="mx-auto w-full max-w-[1120px] px-4 py-5 md:px-7 md:py-7 space-y-5">
+      <div className="flex items-end justify-between gap-3">
+        <h1 className="font-display text-[2rem] font-medium leading-none text-foreground md:text-[2.35rem]">
+          {title}
+        </h1>
+        {action && <div className="shrink-0 flex items-center gap-1.5">{action}</div>}
       </div>
       {children}
     </main>
   );
 }
 
-export function MetricCard({ icon: Icon, label, value, detail, tone = "primary" }: { icon: LucideIcon; label: string; value: string; detail: string; tone?: "primary" | "earth" | "sky" | "risk" }) {
-  const tones = { primary: "bg-primary/15 text-primary", earth: "bg-earth/15 text-earth", sky: "bg-sky/15 text-sky", risk: "bg-risk/15 text-risk" };
-  return <article className="rounded-2xl border border-border bg-card p-5"><div className={`grid size-10 place-items-center rounded-xl ${tones[tone]}`}><Icon className="size-5" /></div><p className="mt-5 text-xs text-muted-foreground">{label}</p><p className="mt-1 text-2xl font-semibold">{value}</p><p className="mt-2 text-xs text-muted-foreground">{detail}</p></article>;
+export function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  detail,
+  tone = "primary",
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  detail?: string;
+  tone?: "primary" | "earth" | "sky" | "risk";
+}) {
+  const tones = {
+    primary: "text-success",
+    earth: "text-earth",
+    sky: "text-sky",
+    risk: "text-risk",
+  };
+
+  return (
+    <div className="panel p-3.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+          {label}
+        </span>
+        <Icon className={`size-3.5 ${tones[tone]}`} strokeWidth={1.75} />
+      </div>
+      <p className="num mt-2 text-[1.45rem] font-medium leading-none text-foreground">{value}</p>
+      {detail && <p className="mt-1.5 text-[11px] text-muted-foreground">{detail}</p>}
+    </div>
+  );
 }
 
-export function SectionTitle({ title, detail }: { title: string; detail?: string }) {
-  return <div className="mb-4 flex items-end justify-between gap-3"><h2 className="text-lg font-semibold">{title}</h2>{detail && <p className="text-xs text-muted-foreground">{detail}</p>}</div>;
+export function SectionTitle({
+  title,
+  detail,
+  action,
+}: {
+  title: string;
+  detail?: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-baseline gap-2 min-w-0">
+        <h2 className="font-display text-[1.05rem] font-semibold text-foreground">{title}</h2>
+        {detail && <p className="text-[11px] text-muted-foreground truncate">{detail}</p>}
+      </div>
+      {action}
+    </div>
+  );
 }
