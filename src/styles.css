@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Atkinson Hyperlegible", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Fraunces", "Times New Roman", serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
   --radius-sm: 3px;
@@ -118,6 +118,11 @@
   * {
     border-color: var(--color-border);
   }
+  html {
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
   html,
   body {
     background-color: var(--background);
@@ -127,9 +132,13 @@
   }
   body {
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "tnum";
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    font-feature-settings: "kern", "liga";
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
     min-height: var(--app-height);
     background-color: var(--background);
     background-image:
@@ -142,14 +151,19 @@
   .font-display {
     font-family: var(--font-display);
     font-optical-sizing: auto;
-    letter-spacing: -0.02em;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.15;
   }
   button,
-  a,
+  a {
+    letter-spacing: inherit;
+  }
   input,
   select,
   textarea {
-    letter-spacing: 0;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
   }
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
@@ -174,7 +188,8 @@
   .num {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.03em;
+    font-weight: 600;
+    letter-spacing: 0.02em;
   }
   .panel {
     background: var(--card);
@@ -223,9 +238,11 @@
   }
   .photo-copy {
     color: #f7f1e4;
+    font-weight: 700;
     text-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.85),
-      0 10px 32px rgba(0, 0, 0, 0.7);
+      0 1px 0 rgba(0, 0, 0, 0.55),
+      0 2px 8px rgba(0, 0, 0, 0.75),
+      0 12px 40px rgba(0, 0, 0, 0.55);
   }
   .photo-copy h1,
   .photo-copy h2 {
@@ -258,6 +275,20 @@
     background: var(--accent);
     border-color: color-mix(in srgb, var(--primary) 40%, transparent);
     transform: none;
+  }
+  .text-\[10px\],
+  .text-\[11px\] {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+  }
+  .text-\[12px\] {
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+  .uppercase {
+    letter-spacing: 0.07em;
   }
 }
 
@@ -296,8 +327,8 @@ body,
   background: #1c1913;
   color: var(--color-foreground);
   font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 700;
   border: 1px solid var(--border);
   box-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
   margin-inline: auto;

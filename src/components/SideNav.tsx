@@ -86,7 +86,7 @@ export function SideNav() {
               key={it.to}
               to={it.to}
               preload="intent"
-              className={`flex h-8 items-center gap-2.5 px-2 text-[13px] ${
+              className={`flex h-9 items-center gap-2.5 px-2 text-[14px] ${
                 collapsed ? "justify-center" : ""
               } ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >

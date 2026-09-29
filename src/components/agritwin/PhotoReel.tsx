@@ -25,12 +25,14 @@ export function PhotoReel({
   ordered = false,
   onIndex,
   holdMs = 2600,
+  sharp = false,
 }: {
   slides?: string[];
   className?: string;
   ordered?: boolean;
   onIndex?: (i: number) => void;
   holdMs?: number;
+  sharp?: boolean;
 }) {
   const pool = slides && slides.length ? slides : STOCK;
   const poolKey = pool.join("|");
@@ -95,8 +97,10 @@ export function PhotoReel({
         backgroundSize: "cover",
         backgroundPosition: "center",
         opacity: on ? 1 : 0,
-        filter: "blur(2px) saturate(1.08) brightness(1.02)",
-        transform: "scale(1.04)",
+        filter: sharp
+          ? "saturate(1.12) brightness(0.94)"
+          : "blur(2px) saturate(1.08) brightness(1.02)",
+        transform: sharp ? "scale(1.02)" : "scale(1.04)",
         transition: "opacity 0.38s linear",
       }}
     />
