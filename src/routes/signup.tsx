@@ -129,7 +129,7 @@ function SignUp() {
       <aside className="photo relative hidden min-h-screen lg:block">
         <img src={SHOT.maize} alt="" className="absolute inset-0 size-full object-cover" />
         <div className="absolute inset-0 bg-[#120f0a]/45" />
-        <div className="relative z-10 flex h-full flex-col justify-between p-10">
+        <div className="photo-copy relative z-10 flex h-full flex-col justify-between p-10">
           <Link to="/" className="inline-flex items-center gap-2.5">
             <BrandMark className="size-8" />
             <span className="font-display text-xl">Akilimo</span>

@@ -33,6 +33,17 @@ export const SHOT = {
     "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80",
 };
 
+export const MARKET_REEL = [
+  { src: SHOT.marketNairobi, place: "Marikiti stall" },
+  { src: SHOT.marketThika, place: "Crate weigh" },
+  { src: SHOT.grain, place: "Grain sacks" },
+  { src: SHOT.maizeLeaf, place: "Maize rows" },
+  { src: SHOT.harvest, place: "Harvest yard" },
+  { src: SHOT.farmer, place: "Field walk" },
+  { src: SHOT.dawn, place: "Dawn haul" },
+  { src: SHOT.coffee, place: "Coffee lots" },
+];
+
 export const CROP_SHOT: Record<string, string> = {
   "White Maize": SHOT.maize,
   "Rosecoco Beans": SHOT.beans,

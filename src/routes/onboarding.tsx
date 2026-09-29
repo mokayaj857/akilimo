@@ -60,8 +60,7 @@ function OnboardingRoute() {
         <div className="grid min-h-screen lg:grid-cols-2">
           <div className="photo relative hidden min-h-[40vh] lg:block">
             <img src={cropShot(crop)} alt="" />
-            <div className="shade absolute inset-0" />
-            <p className="absolute bottom-10 left-10 font-display text-5xl leading-none">{crop}</p>
+            <p className="photo-copy photo-plate absolute inset-x-0 bottom-0 z-[3] px-10 pb-10 pt-24 font-display text-5xl leading-none">{crop}</p>
           </div>
           <div className="flex flex-col justify-center px-5 pb-10 pt-20 sm:px-12">
             <h1 className="font-display text-4xl font-medium">Who farms</h1>
@@ -112,7 +111,7 @@ function OnboardingRoute() {
                       key={c}
                       type="button"
                       onClick={() => setCrop(c)}
-                      className={`photo relative h-16 overflow-hidden ${crop === c ? "ring-2 ring-primary" : "opacity-70"}`}
+                      className={`photo photo-clear relative h-16 overflow-hidden ${crop === c ? "ring-2 ring-primary" : "opacity-70"}`}
                       title={c}
                     >
                       <img src={CROP_SHOT[c]} alt={c} />
@@ -152,9 +151,9 @@ function OnboardingRoute() {
 
       {step === 3 && (
         <div className="relative min-h-screen">
-          <img src={SHOT.aerial} alt="" className="absolute inset-0 size-full object-cover" />
-          <div className="absolute inset-0 bg-[#120f0a]/70" />
-          <div className="relative z-10 flex min-h-screen flex-col justify-end p-6 pb-16 md:p-16">
+          <img src={SHOT.aerial} alt="" className="bg-blur absolute inset-0 size-full object-cover" />
+          <div className="absolute inset-0 bg-[#120f0a]/32" />
+          <div className="photo-copy relative z-10 flex min-h-screen flex-col justify-end p-6 pb-16 md:p-16">
             <p className="text-[12px] uppercase tracking-[0.2em] text-primary">Live</p>
             <h1 className="font-display mt-2 text-5xl font-medium md:text-7xl">{twin.totalAcres} acres</h1>
             <p className="mt-3 text-lg">{twin.primaryCrop} · Sentinel-2</p>

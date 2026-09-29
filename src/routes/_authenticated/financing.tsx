@@ -21,13 +21,12 @@ function FinancingRoute() {
     <FarmPage title="Credit" bleed>
       <div className="photo relative h-[52vh] min-h-[320px] overflow-hidden md:h-[58vh]">
         <img src={SHOT.farmer} alt="" className="object-[center_80%]" />
-        <div className="shade absolute inset-0 z-[1]" />
-        <div className="absolute inset-0 z-[2] flex flex-col justify-end p-5 pb-24 md:p-10 md:pb-10">
+        <div className="photo-copy photo-plate absolute inset-0 z-[3] flex flex-col justify-end p-5 pb-24 md:p-10 md:pb-10">
           <p className="text-[11px] uppercase tracking-[0.22em] text-primary">Twin score</p>
           <div className="mt-2 flex items-end justify-between gap-4">
             <div>
               <h1 className="font-display text-5xl font-medium leading-none md:text-7xl">Credit</h1>
-              <p className="mt-3 text-[14px] text-foreground/80">
+              <p className="mt-3 text-[14px] text-[#f7f1e4]/90">
                 {twin.totalAcres} ac · {twin.primaryCrop}
               </p>
             </div>
@@ -44,7 +43,7 @@ function FinancingRoute() {
           >
             <img src={lenderShot(opt.institutionType)} alt="" className="opacity-50" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#14120e] via-[#14120e]/88 to-[#14120e]/45" />
-            <div className="absolute inset-0 flex items-center justify-between gap-3 p-4 md:px-6">
+            <div className="photo-copy absolute inset-0 z-[3] flex items-center justify-between gap-3 p-4 md:px-6">
               <div className="min-w-0">
                 <p className="truncate text-[16px] md:text-[18px]">
                   {opt.institutionName}

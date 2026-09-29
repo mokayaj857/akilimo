@@ -1,7 +1,9 @@
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FarmPage } from "@/components/agritwin/Page";
+import { AnimatePresence, motion } from "framer-motion";
+import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { useFarmState } from "@/hooks/use-farm-state";
-import { marketShot } from "@/lib/agritwin/imagery";
+import { MARKET_REEL } from "@/lib/agritwin/imagery";
 
 export const Route = createFileRoute("/_authenticated/markets")({
   head: () => ({
@@ -12,39 +14,76 @@ export const Route = createFileRoute("/_authenticated/markets")({
 
 function MarketsRoute() {
   const { markets, twin } = useFarmState();
-  const ranked = [...markets].sort((a, b) => b.netRevenuePerBag - a.netRevenuePerBag);
+  const ranked = useMemo(
+    () => [...markets].sort((a, b) => b.netRevenuePerBag - a.netRevenuePerBag),
+    [markets],
+  );
   const best = ranked[0];
+  const [slide, setSlide] = useState(0);
+  const caption = MARKET_REEL[slide]?.place ?? "";
+  const lit = slide % ranked.length;
 
   return (
-    <FarmPage title="Sell" bleed>
-      <div className="photo relative h-[48vh] min-h-[300px] overflow-hidden md:h-[56vh]">
-        <img src={marketShot(best.town)} alt="" />
-        <div className="shade absolute inset-0 z-[1]" />
-        <div className="absolute inset-0 z-[2] flex flex-col justify-end p-5 pb-24 md:p-10 md:pb-10">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-primary">Highest net</p>
-          <h1 className="font-display mt-1 text-5xl font-medium leading-none md:text-7xl">{best.town}</h1>
-          <p className="num mt-3 text-2xl md:text-3xl">KES {best.netRevenuePerBag.toLocaleString()}</p>
-          <p className="mt-1 text-[13px] text-foreground/70">
-            {twin.primaryCrop} · 90kg · {best.distanceKm} km
+    <main className="relative min-h-[calc(var(--app-height)-3.5rem)]">
+      <PhotoReel slides={MARKET_REEL} onIndex={setSlide} />
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-[#14120e]/20" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[45%] bg-gradient-to-t from-[#14120e] to-transparent" />
+
+      <div className="relative z-[2] px-5 pb-28 pt-6 md:px-10 md:pb-12">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-primary">Sell · {twin.primaryCrop}</p>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={caption}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="photo-copy mt-2 font-display text-lg"
+              >
+                {caption}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+          <div className="flex gap-1.5 pt-2">
+            {MARKET_REEL.map((s, idx) => (
+              <span
+                key={s.src}
+                className={`h-1 w-5 transition-colors ${idx === slide ? "bg-primary" : "bg-white/30"}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="photo-copy mt-8 max-w-xl">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-primary">Highest net</p>
+          <h1 className="font-display mt-1 text-4xl font-medium leading-[0.92] md:text-7xl">{best.town}</h1>
+          <p className="num mt-3 text-2xl md:text-4xl">KES {best.netRevenuePerBag.toLocaleString()}</p>
+          <p className="mt-2 text-[13px] text-[#f7f1e4]/80">
+            {best.distanceKm} km · 90kg · {best.marketDay}
           </p>
         </div>
-      </div>
 
-      <div className="grid gap-3 px-4 pt-4 sm:grid-cols-2 md:px-7">
-        {ranked.map((mkt) => (
-          <div key={mkt.id} className="photo relative h-44 overflow-hidden md:h-52">
-            <img src={marketShot(mkt.town)} alt="" />
-            <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-            <div className="absolute inset-0 z-[2] flex items-end justify-between p-4">
+        <div className="mt-5 border border-white/12 bg-[#14120e]/60 backdrop-blur-md md:max-w-md md:ml-auto">
+          {ranked.map((mkt, idx) => (
+            <motion.div
+              key={mkt.id}
+              animate={{
+                backgroundColor: idx === lit ? "rgba(201,162,39,0.16)" : "rgba(0,0,0,0)",
+              }}
+              className={`flex items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5 last:border-b-0 ${
+                mkt.isTopRecommendation ? "border-l-2 border-l-primary" : "border-l-2 border-l-transparent"
+              }`}
+            >
               <div>
-                <p className="font-display text-2xl leading-none">{mkt.town}</p>
-                <p className="mt-1 text-[12px] text-foreground/70">{mkt.distanceKm} km</p>
+                <p className="photo-copy text-[16px]">{mkt.town}</p>
+                <p className="mt-0.5 text-[11px] text-[#f7f1e4]/55">{mkt.distanceKm} km</p>
               </div>
-              <p className="num text-xl">{mkt.netRevenuePerBag.toLocaleString()}</p>
-            </div>
-          </div>
-        ))}
+              <p className="photo-copy num text-[18px]">{mkt.netRevenuePerBag.toLocaleString()}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </FarmPage>
+    </main>
   );
 }

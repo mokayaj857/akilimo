@@ -102,7 +102,7 @@ export function SideNav() {
         <div className="photo relative h-28 overflow-hidden">
           <img src={cropShot(twin.primaryCrop)} alt="" />
           <div className="shade absolute inset-0" />
-          <p className="absolute bottom-2 left-3 font-display text-sm">{twin.farmName.split(" ")[0]}</p>
+          <p className="photo-copy absolute bottom-2 left-3 z-[3] font-display text-sm">{twin.farmName.split(" ")[0]}</p>
         </div>
       )}
     </motion.aside>

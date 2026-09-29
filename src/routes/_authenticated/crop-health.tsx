@@ -21,10 +21,9 @@ function CropHealthRoute() {
     <FarmPage title="Watch" bleed>
       <div className="photo relative h-[62vh] min-h-[360px] overflow-hidden md:h-[70vh]">
         <img src={SHOT.maizeLeaf} alt="" />
-        <div className="shade absolute inset-0 z-[1]" />
-        <div className="absolute inset-0 z-[2] flex flex-col justify-between p-5 pb-24 md:p-10 md:pb-10">
+        <div className="photo-copy absolute inset-0 z-[3] flex flex-col justify-between p-5 pb-24 md:p-10 md:pb-10">
           <p className="text-[11px] uppercase tracking-[0.22em] text-primary">{twin.primaryCrop}</p>
-          <div>
+          <div className="photo-plate -mx-5 px-5 pt-20 md:-mx-10 md:px-10">
             <p className="text-[11px] uppercase tracking-[0.2em] text-risk">Before the leaf shows it</p>
             <p className="num mt-2 text-6xl text-risk md:text-8xl">{diseasePrediction.riskPercentage}</p>
             <h1 className="font-display mt-3 text-4xl font-medium leading-[0.95] md:text-6xl">{name}</h1>

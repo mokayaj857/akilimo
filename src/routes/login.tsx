@@ -46,8 +46,8 @@ function Login() {
 
   return (
     <div className="dark relative min-h-screen overflow-hidden bg-background text-foreground">
-      <img src={SHOT.dawn} alt="" className="absolute inset-0 size-full object-cover" />
-      <div className="absolute inset-0 bg-[#120f0a]/55" />
+      <img src={SHOT.dawn} alt="" className="bg-blur absolute inset-0 size-full object-cover" />
+      <div className="absolute inset-0 bg-[#120f0a]/28" />
       <div className="shade-side absolute inset-0" />
 
       <div className="relative z-10 flex min-h-screen flex-col justify-between p-6 sm:p-10 lg:flex-row lg:items-end">
@@ -56,7 +56,7 @@ function Login() {
             <BrandMark className="size-9" />
             <span className="font-display text-2xl font-medium">Akilimo</span>
           </Link>
-          <h1 className="font-display mt-10 text-5xl font-medium leading-[0.95] sm:text-6xl lg:text-7xl">
+          <h1 className="photo-copy font-display mt-10 text-5xl font-medium leading-[0.95] sm:text-6xl lg:text-7xl">
             See the farm
             <br />
             from above.
