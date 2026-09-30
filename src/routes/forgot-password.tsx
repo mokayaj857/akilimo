@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { motion } from "framer-motion";
 import { Loader2, ArrowLeft, MailCheck } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { firebaseAuthMessage, getFirebaseAuth } from "@/lib/firebase";
 
 export const Route = createFileRoute("/forgot-password")({
-  head: () => ({ meta: [{ title: "Reset password — Expense It" }] }),
+  head: () => ({ meta: [{ title: "Reset password — Akilimo" }] }),
   component: ForgotPassword,
 });
 
@@ -19,12 +20,17 @@ function ForgotPassword() {
     e.preventDefault();
     if (!email) return;
     setBusy(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    setSent(true);
+    try {
+      await sendPasswordResetEmail(getFirebaseAuth(), email.trim(), {
+        url: `${window.location.origin}/reset-password`,
+        handleCodeInApp: true,
+      });
+      setSent(true);
+    } catch (err) {
+      toast.error(firebaseAuthMessage(err));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -40,7 +46,7 @@ function ForgotPassword() {
           </div>
           <h1 className="text-3xl font-semibold tracking-tight">Check your inbox</h1>
           <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-            We sent a password reset link to <span className="text-foreground font-medium">{email}</span>. The link expires in 1 hour.
+            We sent a password reset link to <span className="text-foreground font-medium">{email}</span>.
           </p>
           <button
             onClick={() => { setSent(false); setEmail(""); }}
@@ -61,7 +67,7 @@ function ForgotPassword() {
             <div className="rounded-2xl bg-card ring-1 ring-border p-4">
               <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Email</label>
               <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-transparent outline-none text-base font-medium mt-1" placeholder="you@company.com" />
+                className="w-full bg-transparent outline-none text-base font-medium mt-1" placeholder="you@farm.ke" />
             </div>
             <motion.button whileTap={{ scale: 0.97 }} disabled={busy} type="submit"
               className="w-full rounded-2xl bg-primary py-4 text-sm font-semibold text-primary-foreground shadow-lg disabled:opacity-50 inline-flex items-center justify-center gap-2">

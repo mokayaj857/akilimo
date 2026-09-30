@@ -1,19 +1,14 @@
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { toast } from "sonner";
 import { AuthStage } from "@/components/agritwin/AuthStage";
 import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { supabase } from "@/integrations/supabase/client";
+import { firebaseAuthMessage, getFirebaseAuth } from "@/lib/firebase";
 
 export const Route = createFileRoute("/login")({
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
-      throw redirect({ to: "/dashboard" });
-    }
-  },
   head: () => ({
     meta: [{ title: "Sign in — Akilimo" }],
   }),
@@ -23,9 +18,11 @@ export const Route = createFileRoute("/login")({
 function Login() {
   const nav = useNavigate();
   const { user, ready } = useAuth();
-  const [identifier, setIdentifier] = useState("+254 712 345 678");
-  const [password, setPassword] = useState("••••••••");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     if (ready && user) {
@@ -35,12 +32,35 @@ function Login() {
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    setFormError(null);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await signInWithEmailAndPassword(getFirebaseAuth(), email.trim(), password);
       toast.success("Karibu.");
-      nav({ to: "/onboarding", replace: true });
-    }, 500);
+      nav({ to: "/dashboard", replace: true });
+    } catch (err) {
+      const text = firebaseAuthMessage(err);
+      setFormError(text);
+      toast.error(text);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogle() {
+    setFormError(null);
+    setGoogleLoading(true);
+    try {
+      await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
+      toast.success("Karibu.");
+      nav({ to: "/dashboard", replace: true });
+    } catch (err) {
+      const text = firebaseAuthMessage(err);
+      setFormError(text);
+      toast.error(text);
+    } finally {
+      setGoogleLoading(false);
+    }
   }
 
   return (
@@ -55,33 +75,40 @@ function Login() {
         </div>
 
         <label className="block space-y-1.5">
-          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Phone</span>
+          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Email</span>
           <input
-            type="text"
+            type="email"
+            autoComplete="email"
             required
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full border-0 border-b border-white/20 bg-transparent py-2.5 text-[16px] outline-none focus:border-primary"
           />
         </label>
         <label className="block space-y-1.5">
           <span className="flex justify-between text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
-            PIN
+            Password
             <Link to="/forgot-password" className="normal-case tracking-normal text-primary">
               Forgot
             </Link>
           </span>
           <input
             type="password"
+            autoComplete="current-password"
             required
+            minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border-0 border-b border-white/20 bg-transparent py-2.5 text-[16px] outline-none focus:border-primary"
           />
         </label>
-        <Button type="submit" disabled={loading} className="h-12 w-full text-[14px]">
+        <Button type="submit" disabled={loading || googleLoading} className="h-12 w-full text-[14px]">
           {loading ? "…" : "Open the map"}
         </Button>
+        <Button type="button" variant="outline" disabled={loading || googleLoading} onClick={handleGoogle} className="h-11 w-full">
+          {googleLoading ? "…" : "Continue with Google"}
+        </Button>
+        {formError && <p className="text-[13px] text-risk">{formError}</p>}
         <p className="text-[13px] text-muted-foreground">
           First season?{" "}
           <Link to="/signup" className="text-primary">

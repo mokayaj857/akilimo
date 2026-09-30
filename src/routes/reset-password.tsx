@@ -1,53 +1,57 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { confirmPasswordReset } from "firebase/auth";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { firebaseAuthMessage, getFirebaseAuth } from "@/lib/firebase";
 
 export const Route = createFileRoute("/reset-password")({
-  head: () => ({ meta: [{ title: "Reset password — Expense It" }] }),
+  head: () => ({ meta: [{ title: "Reset password — Akilimo" }] }),
   component: ResetPassword,
 });
+
+function readOobCode() {
+  if (typeof window === "undefined") return null;
+  const query = new URLSearchParams(window.location.search);
+  const fromQuery = query.get("oobCode");
+  if (fromQuery) return fromQuery;
+  const hash = window.location.hash.startsWith("#") ? window.location.hash.slice(1) : window.location.hash;
+  return new URLSearchParams(hash).get("oobCode");
+}
 
 function ResetPassword() {
   const nav = useNavigate();
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
-  const [ready, setReady] = useState(false);
   const [done, setDone] = useState(false);
-  const [invalid, setInvalid] = useState(false);
+  const oobCode = useMemo(() => readOobCode(), []);
+  const [invalid, setInvalid] = useState(!oobCode);
 
   useEffect(() => {
-    // Supabase fires PASSWORD_RECOVERY when the user lands via the recovery link
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) setReady(true);
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-      else {
-        // Give the URL hash a brief moment to be processed
-        setTimeout(() => {
-          supabase.auth.getSession().then(({ data: d2 }) => {
-            if (!d2.session) setInvalid(true);
-          });
-        }, 1200);
-      }
-    });
-    return () => subscription.unsubscribe();
+    if (!readOobCode()) setInvalid(true);
   }, []);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    const code = readOobCode();
+    if (!code) {
+      setInvalid(true);
+      return;
+    }
     if (pw.length < 8) return toast.error("Use at least 8 characters");
     if (pw !== confirm) return toast.error("Passwords don't match");
     setBusy(true);
-    const { error } = await supabase.auth.updateUser({ password: pw });
-    setBusy(false);
-    if (error) return toast.error(error.message);
-    setDone(true);
-    setTimeout(() => nav({ to: "/dashboard" }), 1400);
+    try {
+      await confirmPasswordReset(getFirebaseAuth(), code, pw);
+      setDone(true);
+      setTimeout(() => nav({ to: "/login" }), 1400);
+    } catch (err) {
+      toast.error(firebaseAuthMessage(err));
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (invalid) {
@@ -72,7 +76,7 @@ function ResetPassword() {
             <CheckCircle2 className="size-6 text-primary" />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight">Password updated</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Taking you to the dashboard…</p>
+          <p className="mt-2 text-sm text-muted-foreground">Taking you to sign in…</p>
         </motion.div>
       </div>
     );
@@ -84,14 +88,12 @@ function ResetPassword() {
         <h1 className="text-2xl font-semibold tracking-tight">Set a new password</h1>
         <p className="mt-1 text-sm text-muted-foreground">Choose something at least 8 characters.</p>
         <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="New password" autoFocus
-          disabled={!ready}
-          className="mt-6 w-full rounded-2xl bg-card ring-1 ring-border px-4 py-3.5 text-sm outline-none disabled:opacity-50" />
+          className="mt-6 w-full rounded-2xl bg-card ring-1 ring-border px-4 py-3.5 text-sm outline-none" />
         <input type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm new password"
-          disabled={!ready}
-          className="mt-3 w-full rounded-2xl bg-card ring-1 ring-border px-4 py-3.5 text-sm outline-none disabled:opacity-50" />
-        <button disabled={busy || !ready} className="mt-3 w-full rounded-2xl bg-primary text-primary-foreground py-3.5 text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50">
+          className="mt-3 w-full rounded-2xl bg-card ring-1 ring-border px-4 py-3.5 text-sm outline-none" />
+        <button disabled={busy} className="mt-3 w-full rounded-2xl bg-primary text-primary-foreground py-3.5 text-sm font-semibold inline-flex items-center justify-center gap-2 disabled:opacity-50">
           {busy && <Loader2 className="size-4 animate-spin" />}
-          {ready ? "Save password" : "Verifying link…"}
+          Save password
         </button>
       </form>
     </div>

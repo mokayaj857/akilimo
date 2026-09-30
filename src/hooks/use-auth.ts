@@ -1,35 +1,43 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Session, User } from "@supabase/supabase-js";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import { getFirebaseAuth, startFirebaseAnalytics } from "@/lib/firebase";
+
+export type AuthUser = {
+  id: string;
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+};
+
+function toAuthUser(user: User | null): AuthUser | null {
+  if (!user) return null;
+  return {
+    id: user.uid,
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName,
+    photoURL: user.photoURL,
+  };
+}
 
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
-
-    const applySession = (nextSession: Session | null) => {
-      if (!mounted) return;
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
+    try {
+      startFirebaseAnalytics();
+      const unsub = onAuthStateChanged(getFirebaseAuth(), (next) => {
+        setUser(toAuthUser(next));
+        setLoading(false);
+      });
+      return unsub;
+    } catch {
       setLoading(false);
-    };
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, s) => {
-      applySession(s);
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      applySession(data.session);
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+      return undefined;
+    }
   }, []);
 
-  return { user, session, loading, ready: !loading };
+  return { user, session: user, loading, ready: !loading };
 }

@@ -9,7 +9,8 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { Toaster } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { getFirebaseAuth } from "@/lib/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 import appCss from "../styles.css?url";
 
@@ -104,37 +105,27 @@ function AuthBridge() {
   const lastUserId = useRef<string | null>(null);
 
   useEffect(() => {
-    let mounted = true;
+    let first = true;
+    let unsub: (() => void) | undefined;
+    try {
+      unsub = onAuthStateChanged(getFirebaseAuth(), (user) => {
+        const nextUserId = user?.uid ?? null;
+        if (first) {
+          first = false;
+          lastUserId.current = nextUserId;
+          return;
+        }
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (mounted) {
-        lastUserId.current = data.session?.user?.id ?? null;
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "INITIAL_SESSION" || event === "TOKEN_REFRESHED") return;
-
-      const nextUserId = session?.user?.id ?? null;
-      const userChanged = lastUserId.current !== nextUserId;
-      lastUserId.current = nextUserId;
-
-      if (event === "SIGNED_OUT") {
-        qc.clear();
+        const signedOut = lastUserId.current && !nextUserId;
+        lastUserId.current = nextUserId;
+        if (signedOut) qc.clear();
         router.invalidate();
-        return;
-      }
+      });
+    } catch {
+      return undefined;
+    }
 
-      if (event === "SIGNED_IN" && !userChanged) return;
-      if (event !== "SIGNED_IN" && event !== "USER_UPDATED" && event !== "PASSWORD_RECOVERY") return;
-
-      router.invalidate();
-    });
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+    return () => unsub?.();
   }, [router, qc]);
   return null;
 }

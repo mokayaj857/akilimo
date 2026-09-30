@@ -1,12 +1,15 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { updateProfile as updateFirebaseProfile } from "firebase/auth";
 import { ArrowLeft } from "lucide-react";
 import { BrandMark } from "@/components/agritwin/BrandMark";
+import { FarmerPhoto } from "@/components/agritwin/FarmerPhoto";
 import { FarmMapper, acresFromPoints, toRelativePolygon, type MapPoint } from "@/components/agritwin/FarmMapper";
 import { PhotoReel } from "@/components/agritwin/PhotoReel";
 import { Button } from "@/components/ui/button";
 import { useFarmState } from "@/hooks/use-farm-state";
 import { CROP_SHOT } from "@/lib/agritwin/imagery";
+import { getFirebaseAuth } from "@/lib/firebase";
 
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
@@ -26,14 +29,31 @@ function OnboardingRoute() {
   const [county, setCounty] = useState(profile.county);
   const [farmName, setFarmName] = useState(twin.farmName);
   const [crop, setCrop] = useState(twin.primaryCrop || "White Maize");
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
   const [points, setPoints] = useState<MapPoint[]>([]);
   const [building, setBuilding] = useState(false);
+
+  useEffect(() => {
+    setFullName(profile.fullName);
+    setPhoneNumber(profile.phoneNumber);
+    setCounty(profile.county);
+    setAvatarUrl(profile.avatarUrl);
+  }, [profile.fullName, profile.phoneNumber, profile.county, profile.avatarUrl]);
+
+  useEffect(() => {
+    setFarmName(twin.farmName);
+    if (twin.primaryCrop) setCrop(twin.primaryCrop);
+  }, [twin.farmName, twin.primaryCrop]);
 
   const acres = acresFromPoints(points);
 
   const finish = () => {
     setBuilding(true);
-    updateProfile({ fullName, phoneNumber, county });
+    updateProfile({ fullName, phoneNumber, county, avatarUrl });
+    const fbUser = getFirebaseAuth().currentUser;
+    if (fbUser && fullName.trim()) {
+      void updateFirebaseProfile(fbUser, { displayName: fullName.trim() });
+    }
     generateTwin({
       farmName,
       county,
@@ -72,11 +92,19 @@ function OnboardingRoute() {
           <div className="flex flex-col justify-center px-5 pb-10 pt-20 sm:px-12">
             <h1 className="font-display text-4xl font-medium">Who farms</h1>
             <div className="mt-8 space-y-5">
+              <div>
+                <p className="mb-2 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Photo</p>
+                <div className="flex items-center gap-3">
+                  <FarmerPhoto url={avatarUrl} name={fullName} sizeClass="size-16" onChange={setAvatarUrl} />
+                  <p className="text-[13px] text-muted-foreground">Tap to use your photo, not a stock portrait.</p>
+                </div>
+              </div>
               <label className="block space-y-1">
                 <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Name</span>
                 <input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
+                  placeholder="Your name"
                   className="w-full border-0 border-b border-border bg-transparent py-2 text-[16px] outline-none focus:border-primary"
                 />
               </label>
@@ -95,9 +123,11 @@ function OnboardingRoute() {
                   onChange={(e) => setCounty(e.target.value)}
                   className="w-full border-0 border-b border-border bg-transparent py-2 text-[16px]"
                 >
-                  {["Kiambu", "Murang'a", "Nyeri", "Nakuru", "Uasin Gishu", "Trans Nzoia", "Machakos", "Meru"].map(
+                  {["", "Kiambu", "Murang'a", "Nyeri", "Nakuru", "Uasin Gishu", "Trans Nzoia", "Machakos", "Meru"].map(
                     (c) => (
-                      <option key={c}>{c}</option>
+                      <option key={c || "none"} value={c}>
+                        {c || "Select county"}
+                      </option>
                     ),
                   )}
                 </select>

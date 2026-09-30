@@ -1,9 +1,12 @@
-import { createFileRoute, Link, Outlet, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Box, HeartPulse, LayoutDashboard, Menu, Store, User, Wallet, X } from "lucide-react";
+import { FarmerPhoto } from "@/components/agritwin/FarmerPhoto";
 import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { SideNav } from "@/components/SideNav";
+import { useAuth } from "@/hooks/use-auth";
 import { useFarmState } from "@/hooks/use-farm-state";
+import { firstNameFrom } from "@/lib/farmer-identity";
 
 export const Route = createFileRoute("/_authenticated")({ component: AuthedLayout });
 
@@ -16,9 +19,16 @@ const NAV = [
 ] as const;
 
 function AuthedLayout() {
+  const nav = useNavigate();
   const { profile } = useFarmState();
+  const { user, ready } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const welcome = firstNameFrom(profile.fullName || user?.displayName, user?.email);
+
+  useEffect(() => {
+    if (ready && !user) nav({ to: "/login", replace: true });
+  }, [nav, ready, user]);
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -40,16 +50,16 @@ function AuthedLayout() {
             >
               {mobileMenuOpen ? <X className="size-4" /> : <Menu className="size-4" />}
             </button>
-            <p className="font-display text-sm text-foreground">Welcome farmer</p>
+            <p className="font-display text-sm text-foreground">Welcome {welcome}</p>
           </div>
 
-          <p className="hidden font-display text-[15px] text-foreground md:block">Welcome farmer</p>
+          <p className="hidden font-display text-[15px] text-foreground md:block">Welcome {welcome}</p>
 
           <div className="flex items-center gap-1">
             <LanguageSelector variant="button" />
             <Link to="/profile" aria-label="Open farm profile" className="ml-1 flex items-center gap-2 pl-1">
-              <img src={profile.avatarUrl} alt="" className="size-6 object-cover" />
-              <span className="hidden sm:inline text-[12px]">{profile.fullName.split(" ")[0]}</span>
+              <FarmerPhoto url={profile.avatarUrl} name={profile.fullName || welcome} sizeClass="size-6" />
+              <span className="hidden sm:inline text-[12px]">{welcome}</span>
             </Link>
           </div>
         </header>

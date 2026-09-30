@@ -12,17 +12,14 @@ import {
   FarmAlert,
 } from "@/lib/agritwin/types";
 import {
-  MOCK_ACTIVITIES,
-  MOCK_ALERTS,
   MOCK_DISEASE_PREDICTION,
-  MOCK_FARM,
-  MOCK_FARMER_PROFILE,
-  MOCK_LEAF_DIAGNOSES,
   MOCK_MARKET_PRICES,
   MOCK_SACCO_OPTIONS,
   MOCK_WEATHER,
   MOCK_ZONES,
 } from "@/lib/agritwin/mock-data";
+import { useAuth } from "@/hooks/use-auth";
+import { emptyFarmer, isDummyFarmName, isDummyFarmer } from "@/lib/farmer-identity";
 
 interface FarmStateContextType {
   profile: FarmerProfile;
@@ -61,6 +58,23 @@ const FarmStateContext = createContext<FarmStateContextType | undefined>(undefin
 
 const STORAGE_PREFIX = "Akilimo_state_";
 
+const EMPTY_FARM: DigitalTwinFarm = {
+  id: "",
+  farmName: "",
+  totalAcres: 0,
+  perimeterMeters: 0,
+  latitude: 0,
+  longitude: 0,
+  elevationMeters: 0,
+  soilType: "",
+  primaryWaterSource: "",
+  lastSatelliteSync: "",
+  lastIoTSync: "",
+  mapped: false,
+  primaryCrop: "",
+  infrastructure: [],
+};
+
 function parseJson<T>(raw: string | null, fallback: T): T {
   if (!raw) return fallback;
   try {
@@ -70,78 +84,117 @@ function parseJson<T>(raw: string | null, fallback: T): T {
   }
 }
 
+function scopedKey(uid: string, part: string) {
+  return `${STORAGE_PREFIX}${uid}_${part}`;
+}
+
+function readStored<T>(uid: string, part: string, fallback: T): T {
+  const scoped = parseJson(localStorage.getItem(scopedKey(uid, part)), null as T | null);
+  if (scoped != null) return scoped;
+  return parseJson(localStorage.getItem(`${STORAGE_PREFIX}${part}`), fallback);
+}
+
 export function FarmStateProvider({ children }: { children: React.ReactNode }) {
-  const [profile, setProfile] = useState<FarmerProfile>(MOCK_FARMER_PROFILE);
-  const [twin, setTwin] = useState<DigitalTwinFarm>(MOCK_FARM);
-  const [zones, setZones] = useState<CropZone[]>(MOCK_ZONES);
+  const { user, ready } = useAuth();
+  const [profile, setProfile] = useState<FarmerProfile>(emptyFarmer(""));
+  const [twin, setTwin] = useState<DigitalTwinFarm>(EMPTY_FARM);
+  const [zones, setZones] = useState<CropZone[]>([]);
   const [weather] = useState<WeatherForecast>(MOCK_WEATHER);
   const [diseasePrediction] = useState<DiseasePrediction>(MOCK_DISEASE_PREDICTION);
-  const [diagnoses, setDiagnoses] = useState<LeafDiagnosis[]>(MOCK_LEAF_DIAGNOSES);
+  const [diagnoses, setDiagnoses] = useState<LeafDiagnosis[]>([]);
   const [markets] = useState<KenyanMarketPrice[]>(MOCK_MARKET_PRICES);
   const [saccoOptions] = useState<SaccoLoanOption[]>(MOCK_SACCO_OPTIONS);
-  const [alerts, setAlerts] = useState<FarmAlert[]>(MOCK_ALERTS);
-  const [activities, setActivities] = useState<ActivityLog[]>(MOCK_ACTIVITIES);
+  const [alerts, setAlerts] = useState<FarmAlert[]>([]);
+  const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [ownerId, setOwnerId] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!ready) return;
+    const uid = user?.uid ?? "";
     try {
-      setProfile(parseJson(localStorage.getItem(`${STORAGE_PREFIX}profile`), MOCK_FARMER_PROFILE));
-      const parsedTwin = parseJson(localStorage.getItem(`${STORAGE_PREFIX}twin`), MOCK_FARM);
-      setTwin({
-        ...MOCK_FARM,
-        ...parsedTwin,
-        mapped: parsedTwin.mapped ?? true,
-        primaryCrop: parsedTwin.primaryCrop ?? MOCK_FARM.primaryCrop,
-      });
-      setZones(parseJson(localStorage.getItem(`${STORAGE_PREFIX}zones`), MOCK_ZONES));
-      setDiagnoses(parseJson(localStorage.getItem(`${STORAGE_PREFIX}diagnoses`), MOCK_LEAF_DIAGNOSES));
-      setAlerts(parseJson(localStorage.getItem(`${STORAGE_PREFIX}alerts`), MOCK_ALERTS));
-      setActivities(parseJson(localStorage.getItem(`${STORAGE_PREFIX}activities`), MOCK_ACTIVITIES));
-    } catch {}
+      if (!uid) {
+        setProfile(emptyFarmer(""));
+        setTwin(EMPTY_FARM);
+        setZones([]);
+        setDiagnoses([]);
+        setAlerts([]);
+        setActivities([]);
+      } else {
+        const loadedProfile = readStored(uid, "profile", emptyFarmer(uid));
+        const seeded = isDummyFarmer(loadedProfile) ? emptyFarmer(uid) : loadedProfile;
+        setProfile({
+          ...seeded,
+          id: uid,
+          fullName: seeded.fullName.trim() || user?.displayName || user?.email?.split("@")[0] || "",
+          avatarUrl: seeded.avatarUrl || user?.photoURL || "",
+        });
+        const loadedTwin = readStored(uid, "twin", EMPTY_FARM);
+        const dummyTwin = !loadedTwin || isDummyFarmName(loadedTwin.farmName, loadedTwin.id);
+        setTwin(dummyTwin ? EMPTY_FARM : { ...EMPTY_FARM, ...loadedTwin });
+        const loadedZones = readStored(uid, "zones", [] as CropZone[]);
+        setZones(!dummyTwin && Array.isArray(loadedZones) ? loadedZones : []);
+        if (dummyTwin) {
+          setDiagnoses([]);
+          setAlerts([]);
+          setActivities([]);
+        } else {
+          setDiagnoses(readStored(uid, "diagnoses", [] as LeafDiagnosis[]));
+          setAlerts(readStored(uid, "alerts", [] as FarmAlert[]));
+          setActivities(readStored(uid, "activities", [] as ActivityLog[]));
+        }
+      }
+    } catch {
+      setProfile(emptyFarmer(uid));
+      setTwin(EMPTY_FARM);
+    }
+    setOwnerId(uid || null);
     setHydrated(true);
-  }, []);
+  }, [ready, user?.uid, user?.displayName, user?.email, user?.photoURL]);
+
+  const persistForOwner = hydrated && ownerId === (user?.uid ?? null) && !!ownerId;
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!persistForOwner || !ownerId) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}profile`, JSON.stringify(profile));
+      localStorage.setItem(scopedKey(ownerId, "profile"), JSON.stringify(profile));
     } catch {}
-  }, [hydrated, profile]);
+  }, [persistForOwner, ownerId, profile]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!persistForOwner || !ownerId) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}twin`, JSON.stringify(twin));
+      localStorage.setItem(scopedKey(ownerId, "twin"), JSON.stringify(twin));
     } catch {}
-  }, [hydrated, twin]);
+  }, [persistForOwner, ownerId, twin]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!persistForOwner || !ownerId) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}zones`, JSON.stringify(zones));
+      localStorage.setItem(scopedKey(ownerId, "zones"), JSON.stringify(zones));
     } catch {}
-  }, [hydrated, zones]);
+  }, [persistForOwner, ownerId, zones]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!persistForOwner || !ownerId) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}diagnoses`, JSON.stringify(diagnoses));
+      localStorage.setItem(scopedKey(ownerId, "diagnoses"), JSON.stringify(diagnoses));
     } catch {}
-  }, [hydrated, diagnoses]);
+  }, [persistForOwner, ownerId, diagnoses]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!persistForOwner || !ownerId) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}alerts`, JSON.stringify(alerts));
+      localStorage.setItem(scopedKey(ownerId, "alerts"), JSON.stringify(alerts));
     } catch {}
-  }, [hydrated, alerts]);
+  }, [persistForOwner, ownerId, alerts]);
 
   useEffect(() => {
-    if (!hydrated) return;
+    if (!persistForOwner || !ownerId) return;
     try {
-      localStorage.setItem(`${STORAGE_PREFIX}activities`, JSON.stringify(activities));
+      localStorage.setItem(scopedKey(ownerId, "activities"), JSON.stringify(activities));
     } catch {}
-  }, [hydrated, activities]);
+  }, [persistForOwner, ownerId, activities]);
 
   const updateProfile = (updates: Partial<FarmerProfile>) => {
     setProfile((prev) => ({ ...prev, ...updates }));
@@ -191,6 +244,7 @@ export function FarmStateProvider({ children }: { children: React.ReactNode }) {
   }) => {
     const now = new Date().toISOString().slice(0, 16).replace("T", " ");
     updateTwin({
+      id: ownerId ? `farm-${ownerId}` : "farm-mapped",
       farmName: input.farmName,
       totalAcres: input.acres,
       perimeterMeters: Math.round(Math.sqrt(input.acres) * 250),
@@ -198,6 +252,7 @@ export function FarmStateProvider({ children }: { children: React.ReactNode }) {
       lastSatelliteSync: `${now} EAT`,
       mapped: true,
       primaryCrop: input.crop,
+      infrastructure: [],
       ...(typeof input.latitude === "number" ? { latitude: input.latitude } : {}),
       ...(typeof input.longitude === "number" ? { longitude: input.longitude } : {}),
     });
@@ -213,12 +268,12 @@ export function FarmStateProvider({ children }: { children: React.ReactNode }) {
   };
 
   const resetToDefaults = () => {
-    setProfile(MOCK_FARMER_PROFILE);
-    setTwin(MOCK_FARM);
-    setZones(MOCK_ZONES);
-    setDiagnoses(MOCK_LEAF_DIAGNOSES);
-    setAlerts(MOCK_ALERTS);
-    setActivities(MOCK_ACTIVITIES);
+    setProfile(emptyFarmer(ownerId || ""));
+    setTwin(EMPTY_FARM);
+    setZones([]);
+    setDiagnoses([]);
+    setAlerts([]);
+    setActivities([]);
   };
 
   const unreadAlertsCount = alerts.filter((a) => !a.isRead).length;

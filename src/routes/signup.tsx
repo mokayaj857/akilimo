@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -9,15 +8,9 @@ import { AuthStage } from "@/components/agritwin/AuthStage";
 import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { lovable } from "@/integrations/lovable";
-import { supabase } from "@/integrations/supabase/client";
-import { getAllowedEmailDomain } from "@/lib/app-settings.functions";
+import { firebaseAuthMessage, getFirebaseAuth } from "@/lib/firebase";
 
 export const Route = createFileRoute("/signup")({
-  beforeLoad: async () => {
-    const { data } = await supabase.auth.getSession();
-    if (data.session) throw redirect({ to: "/dashboard" });
-  },
   head: () => ({
     meta: [
       { title: "Create your Akilimo account" },
@@ -48,13 +41,6 @@ function SignUp() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [confirmationEmail, setConfirmationEmail] = useState<string | null>(null);
-  const fetchAllowedDomain = useServerFn(getAllowedEmailDomain);
-  const { data: allowedDomain } = useQuery({
-    queryKey: ["allowed-email-domain"],
-    queryFn: () => fetchAllowedDomain(),
-    staleTime: 5 * 60_000,
-  });
 
   useEffect(() => {
     if (ready && user) navigate({ to: "/dashboard", replace: true });
@@ -82,25 +68,12 @@ function SignUp() {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/login`,
-          data: { full_name: fullName.trim() },
-        },
-      });
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-      if (data.session) {
-        navigate({ to: "/onboarding", replace: true });
-        return;
-      }
-      setConfirmationEmail(email.trim());
+      const cred = await createUserWithEmailAndPassword(getFirebaseAuth(), email.trim(), password);
+      await updateProfile(cred.user, { displayName: fullName.trim() });
+      toast.success("Karibu.");
+      navigate({ to: "/onboarding", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not register.");
+      toast.error(firebaseAuthMessage(err));
     } finally {
       setLoading(false);
     }
@@ -109,13 +82,13 @@ function SignUp() {
   async function handleGoogle() {
     if (googleLoading) return;
     setGoogleLoading(true);
-    const domain = allowedDomain?.domain ?? undefined;
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-      ...(domain ? { extraParams: { hd: domain } } : {}),
-    });
-    if (result.error) {
-      toast.error(result.error.message);
+    try {
+      await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
+      toast.success("Karibu.");
+      navigate({ to: "/onboarding", replace: true });
+    } catch (err) {
+      toast.error(firebaseAuthMessage(err));
+    } finally {
       setGoogleLoading(false);
     }
   }
@@ -130,18 +103,6 @@ function SignUp() {
 
   return (
     <AuthStage kicker="New farm" title={<>Draw the line.<br />Own the season.</>}>
-      {confirmationEmail ? (
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-primary">Inbox</p>
-          <h2 className="font-display mt-1 text-3xl">Check the letter</h2>
-          <p className="mt-4 text-[14px] text-muted-foreground">
-            Sent to <span className="text-foreground">{confirmationEmail}</span>.
-          </p>
-          <Button asChild variant="outline" className="mt-6 h-11 w-full">
-            <Link to="/login">Sign in</Link>
-          </Button>
-        </div>
-      ) : (
         <div>
           <div className="mb-6 flex items-end justify-between gap-3">
             <div>
@@ -252,7 +213,6 @@ function SignUp() {
             </Link>
           </p>
         </div>
-      )}
     </AuthStage>
   );
 }

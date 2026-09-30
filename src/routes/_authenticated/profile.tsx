@@ -1,9 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { signOut, updateProfile as updateFirebaseProfile } from "firebase/auth";
+import { FarmerPhoto } from "@/components/agritwin/FarmerPhoto";
 import { LanguageSelector } from "@/components/agritwin/LanguageSelector";
 import { FarmPage } from "@/components/agritwin/Page";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 import { useFarmState } from "@/hooks/use-farm-state";
+import { getFirebaseAuth } from "@/lib/firebase";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -47,7 +51,9 @@ function Row({ k, v, mono }: { k: string; v: string; mono?: boolean }) {
 }
 
 export function ProfileRoute() {
-  const { profile, twin, updateProfile, resetToDefaults } = useFarmState();
+  const nav = useNavigate();
+  const { user } = useAuth();
+  const { profile, twin, updateProfile } = useFarmState();
   const [fullName, setFullName] = useState(profile.fullName);
   const [phoneNumber, setPhoneNumber] = useState(profile.phoneNumber);
   const [nationalId, setNationalId] = useState(profile.nationalId);
@@ -56,7 +62,8 @@ export function ProfileRoute() {
   const [ward, setWard] = useState(profile.ward);
   const [saccoMembership, setSaccoMembership] = useState(profile.saccoMembership || "");
   const [memberNumber, setMemberNumber] = useState(profile.memberNumber || "");
-  const [years, setYears] = useState(String(profile.experienceYears));
+  const [years, setYears] = useState(profile.experienceYears ? String(profile.experienceYears) : "");
+  const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl);
 
   useEffect(() => {
     setFullName(profile.fullName);
@@ -67,7 +74,8 @@ export function ProfileRoute() {
     setWard(profile.ward);
     setSaccoMembership(profile.saccoMembership || "");
     setMemberNumber(profile.memberNumber || "");
-    setYears(String(profile.experienceYears));
+    setYears(profile.experienceYears ? String(profile.experienceYears) : "");
+    setAvatarUrl(profile.avatarUrl);
   }, [profile]);
 
   function handleSave(e: React.FormEvent) {
@@ -82,14 +90,19 @@ export function ProfileRoute() {
       ward,
       saccoMembership,
       memberNumber,
+      avatarUrl,
       experienceYears: Number.isFinite(experienceYears) ? experienceYears : profile.experienceYears,
     });
+    const fbUser = getFirebaseAuth().currentUser;
+    if (fbUser && fullName.trim()) {
+      void updateFirebaseProfile(fbUser, { displayName: fullName.trim() });
+    }
     toast.success("Saved.");
   }
 
   return (
     <FarmPage
-      title={fullName}
+      title={fullName || user?.displayName || user?.email || "Farm"}
       action={
         <Link to="/onboarding" className="text-[13px] text-primary">
           Remap
@@ -97,18 +110,30 @@ export function ProfileRoute() {
       }
     >
       <div className="flex items-center gap-4 border-b border-border pb-5">
-        <img src={profile.avatarUrl} alt="" className="size-16 object-cover" />
+        <FarmerPhoto
+          url={avatarUrl}
+          name={fullName || user?.displayName || ""}
+          sizeClass="size-16"
+          onChange={(next) => {
+            setAvatarUrl(next);
+            updateProfile({ avatarUrl: next });
+          }}
+        />
         <div className="min-w-0">
-          <p className="num text-[13px] text-primary">{nationalId}</p>
+          {nationalId ? <p className="num text-[13px] text-primary">{nationalId}</p> : null}
           <p className="mt-1 truncate text-[14px] text-muted-foreground">
-            {phoneNumber} · {county}
+            {[phoneNumber, county].filter(Boolean).join(" · ") || user?.email || "Add your details"}
           </p>
-          <p className="mt-0.5 text-[12px] text-muted-foreground">{profile.experienceYears} years farming</p>
+          {profile.experienceYears > 0 ? (
+            <p className="mt-0.5 text-[12px] text-muted-foreground">{profile.experienceYears} years farming</p>
+          ) : null}
         </div>
-        <div className="ml-auto hidden text-right sm:block">
-          <p className="num text-3xl leading-none">{twin.totalAcres}</p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">acres</p>
-        </div>
+        {twin.mapped ? (
+          <div className="ml-auto hidden text-right sm:block">
+            <p className="num text-3xl leading-none">{twin.totalAcres}</p>
+            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">acres</p>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-10 lg:grid-cols-2">
@@ -136,35 +161,51 @@ export function ProfileRoute() {
 
         <div>
           <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Land</p>
-          <p className="mt-2 text-[16px]">{twin.primaryCrop}</p>
-          <dl className="mt-4">
-            <Row k="Acres" v={String(twin.totalAcres)} mono />
-            <Row k="Perimeter" v={`${twin.perimeterMeters} m`} mono />
-            <Row k="Lat / lng" v={`${twin.latitude.toFixed(4)}, ${twin.longitude.toFixed(4)}`} mono />
-            <Row k="Elevation" v={`${twin.elevationMeters} m`} mono />
-            <Row k="Soil" v={twin.soilType} />
-            <Row k="Water" v={twin.primaryWaterSource} />
-          </dl>
-          {twin.infrastructure.length > 0 && (
-            <ul className="mt-6 space-y-1.5 border-t border-border pt-4 text-[13px]">
-              {twin.infrastructure.map((item) => (
-                <li key={item.id} className="flex justify-between gap-3">
-                  <span>{item.name}</span>
-                  <span className="text-muted-foreground">{item.status}</span>
-                </li>
-              ))}
-            </ul>
+          {twin.mapped ? (
+            <>
+              <p className="mt-2 text-[16px]">{twin.primaryCrop || twin.farmName}</p>
+              <dl className="mt-4">
+                {twin.farmName ? <Row k="Farm" v={twin.farmName} /> : null}
+                <Row k="Acres" v={String(twin.totalAcres)} mono />
+                {twin.perimeterMeters ? <Row k="Perimeter" v={`${twin.perimeterMeters} m`} mono /> : null}
+                {twin.latitude || twin.longitude ? (
+                  <Row k="Lat / lng" v={`${twin.latitude.toFixed(4)}, ${twin.longitude.toFixed(4)}`} mono />
+                ) : null}
+                {twin.elevationMeters ? <Row k="Elevation" v={`${twin.elevationMeters} m`} mono /> : null}
+                {twin.soilType ? <Row k="Soil" v={twin.soilType} /> : null}
+                {twin.primaryWaterSource ? <Row k="Water" v={twin.primaryWaterSource} /> : null}
+              </dl>
+              {twin.infrastructure.length > 0 && (
+                <ul className="mt-6 space-y-1.5 border-t border-border pt-4 text-[13px]">
+                  {twin.infrastructure.map((item) => (
+                    <li key={item.id} className="flex justify-between gap-3">
+                      <span>{item.name}</span>
+                      <span className="text-muted-foreground">{item.status}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : (
+            <p className="mt-3 text-[14px] text-muted-foreground">
+              No farm mapped yet.{" "}
+              <Link to="/onboarding" className="text-primary">
+                Map it
+              </Link>
+            </p>
           )}
-          <button
+          <Button
             type="button"
-            className="mt-6 text-[12px] text-muted-foreground hover:text-foreground"
-            onClick={() => {
-              resetToDefaults();
-              toast.success("Demo farm restored.");
+            variant="outline"
+            className="mt-8 w-full"
+            onClick={async () => {
+              await signOut(getFirebaseAuth());
+              toast.success("Signed out.");
+              nav({ to: "/login", replace: true });
             }}
           >
-            Reset demo
-          </button>
+            Sign out
+          </Button>
         </div>
       </div>
     </FarmPage>
