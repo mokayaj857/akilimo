@@ -29,13 +29,7 @@ function readFileAsJpegDataUrl(file: File): Promise<string> {
     };
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") resolve(reader.result);
-        else reject(new Error("Could not open that file"));
-      };
-      reader.onerror = () => reject(new Error("Could not open that file"));
-      reader.readAsDataURL(file);
+      reject(new Error("Could not open that file"));
     };
     img.src = url;
   });

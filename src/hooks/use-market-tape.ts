@@ -19,13 +19,7 @@ function nudge(last: number, base: number) {
 }
 
 function seedSpark(base: number) {
-  let v = base;
-  const out: number[] = [];
-  for (let i = 0; i < 28; i++) {
-    v = nudge(v, base);
-    out.push(v);
-  }
-  return out;
+  return Array.from({ length: 28 }, () => base);
 }
 
 function startBooks(markets: KenyanMarketPrice[]) {
@@ -43,17 +37,7 @@ function startBooks(markets: KenyanMarketPrice[]) {
 
 export function useMarketTape(markets: KenyanMarketPrice[]) {
   const [books, setBooks] = useState(() => startBooks(markets));
-  const [clock, setClock] = useState(() =>
-    typeof Intl !== "undefined"
-      ? new Date().toLocaleTimeString("en-GB", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          timeZone: "Africa/Nairobi",
-        })
-      : "00:00:00",
-  );
+  const [clock, setClock] = useState("00:00:00");
   const marketsRef = useRef(markets);
   marketsRef.current = markets;
 

@@ -40,6 +40,12 @@ function OnboardingRoute() {
       crop,
       acres: acres || 3.8,
       polygon: toRelativePolygon(points),
+      latitude: points.length
+        ? points.reduce((s, p) => s + p.lat, 0) / points.length
+        : undefined,
+      longitude: points.length
+        ? points.reduce((s, p) => s + p.lng, 0) / points.length
+        : undefined,
     });
     setTimeout(() => {
       setBuilding(false);

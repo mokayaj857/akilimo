@@ -47,36 +47,42 @@ export function SideNav() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    document.documentElement.style.setProperty("--sidenav-width", collapsed ? "3.75rem" : "12.5rem");
+    document.documentElement.style.setProperty("--sidenav-width", collapsed ? "4.5rem" : "15rem");
   }, [collapsed]);
 
-  const width = collapsed ? "3.75rem" : "12.5rem";
+  const width = collapsed ? "4.5rem" : "15rem";
 
   return (
     <motion.aside
       initial={false}
       animate={{ width }}
       transition={{ type: "spring", stiffness: 380, damping: 38 }}
-      className="fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-border bg-[#16130f] md:flex overflow-hidden"
+      className="fixed inset-y-0 left-0 z-30 hidden overflow-hidden border-r border-primary/35 bg-[#1c1810] shadow-[8px_0_32px_rgba(0,0,0,0.45)] md:flex md:flex-col"
     >
-      <div className={`flex h-14 items-center border-b border-border ${collapsed ? "justify-center" : "justify-between px-3"}`}>
+      <div className="h-1 w-full bg-primary" />
+
+      <div
+        className={`flex h-16 items-center border-b border-white/10 ${
+          collapsed ? "justify-center" : "justify-between gap-2 px-3"
+        }`}
+      >
         {!collapsed && (
-          <Link to="/dashboard" className="flex items-center gap-2 text-foreground">
-            <BrandMark className="size-7" />
-            <span className="font-display text-[1.05rem] font-semibold leading-none">Akilimo</span>
+          <Link to="/dashboard" className="flex min-w-0 items-center gap-2.5 text-foreground">
+            <BrandMark className="size-9 shrink-0" />
+            <span className="font-display text-[1.35rem] font-semibold leading-none tracking-tight">Akilimo</span>
           </Link>
         )}
         <button
           type="button"
           onClick={toggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="grid size-7 place-items-center text-muted-foreground hover:text-foreground"
+          className="grid size-10 place-items-center text-foreground hover:bg-primary hover:text-primary-foreground"
         >
-          {collapsed ? <ChevronRight className="size-3.5" /> : <ChevronLeft className="size-3.5" />}
+          {collapsed ? <ChevronRight className="size-5" /> : <ChevronLeft className="size-5" />}
         </button>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-px">
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2 pt-3" aria-label="Farm">
         {ITEMS.map((it) => {
           const active = path === it.to || path.startsWith(`${it.to}/`);
           const Icon = it.icon;
@@ -86,13 +92,26 @@ export function SideNav() {
               key={it.to}
               to={it.to}
               preload="intent"
-              className={`flex h-9 items-center gap-2.5 px-2 text-[14px] ${
-                collapsed ? "justify-center" : ""
-              } ${active ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              title={it.label}
+              className={`group relative flex min-h-12 items-center gap-3 px-3 text-[17px] font-bold leading-none ${
+                collapsed ? "justify-center px-0" : ""
+              } ${
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : "text-[#f1eadc] hover:bg-primary/20"
+              }`}
             >
-              <Icon className="size-3.5 shrink-0" strokeWidth={active ? 2.2 : 1.7} />
+              {active && <span className="absolute inset-y-0 left-0 w-1 bg-[#1a160c]" />}
+              <Icon className="size-5 shrink-0" strokeWidth={active ? 2.4 : 2} />
               {!collapsed && <span className="truncate">{it.label}</span>}
-              {!collapsed && warn && <span className="ml-auto num text-[10px]">!</span>}
+              {warn &&
+                (collapsed ? (
+                  <span className="absolute right-1 top-1 size-2.5 bg-risk" />
+                ) : (
+                  <span className="ml-auto grid size-7 place-items-center bg-risk text-[16px] font-bold text-white">
+                    !
+                  </span>
+                ))}
             </Link>
           );
         })}

@@ -45,13 +45,15 @@ interface FarmStateContextType {
   markAlertRead: (alertId: string) => void;
   markAllAlertsRead: () => void;
   addActivity: (activity: Omit<ActivityLog, "id" | "date">) => void;
-  generateTwin: (input: {
-    farmName: string;
-    county: string;
-    crop: string;
-    acres: number;
-    polygon: Array<[number, number]>;
-  }) => void;
+    generateTwin: (input: {
+      farmName: string;
+      county: string;
+      crop: string;
+      acres: number;
+      polygon: Array<[number, number]>;
+      latitude?: number;
+      longitude?: number;
+    }) => void;
   resetToDefaults: () => void;
 }
 
@@ -59,109 +61,87 @@ const FarmStateContext = createContext<FarmStateContextType | undefined>(undefin
 
 const STORAGE_PREFIX = "Akilimo_state_";
 
+function parseJson<T>(raw: string | null, fallback: T): T {
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
 export function FarmStateProvider({ children }: { children: React.ReactNode }) {
-  const [profile, setProfile] = useState<FarmerProfile>(() => {
-    try {
-      const saved = localStorage.getItem(`${STORAGE_PREFIX}profile`);
-      return saved ? JSON.parse(saved) : MOCK_FARMER_PROFILE;
-    } catch {
-      return MOCK_FARMER_PROFILE;
-    }
-  });
-
-  const [twin, setTwin] = useState<DigitalTwinFarm>(() => {
-    try {
-      const saved = localStorage.getItem(`${STORAGE_PREFIX}twin`);
-      const parsed = saved ? JSON.parse(saved) : MOCK_FARM;
-      return {
-        ...MOCK_FARM,
-        ...parsed,
-        mapped: parsed.mapped ?? true,
-        primaryCrop: parsed.primaryCrop ?? MOCK_FARM.primaryCrop,
-      };
-    } catch {
-      return MOCK_FARM;
-    }
-  });
-
-  const [zones, setZones] = useState<CropZone[]>(() => {
-    try {
-      const saved = localStorage.getItem(`${STORAGE_PREFIX}zones`);
-      return saved ? JSON.parse(saved) : MOCK_ZONES;
-    } catch {
-      return MOCK_ZONES;
-    }
-  });
-
+  const [profile, setProfile] = useState<FarmerProfile>(MOCK_FARMER_PROFILE);
+  const [twin, setTwin] = useState<DigitalTwinFarm>(MOCK_FARM);
+  const [zones, setZones] = useState<CropZone[]>(MOCK_ZONES);
   const [weather] = useState<WeatherForecast>(MOCK_WEATHER);
   const [diseasePrediction] = useState<DiseasePrediction>(MOCK_DISEASE_PREDICTION);
-
-  const [diagnoses, setDiagnoses] = useState<LeafDiagnosis[]>(() => {
-    try {
-      const saved = localStorage.getItem(`${STORAGE_PREFIX}diagnoses`);
-      return saved ? JSON.parse(saved) : MOCK_LEAF_DIAGNOSES;
-    } catch {
-      return MOCK_LEAF_DIAGNOSES;
-    }
-  });
-
+  const [diagnoses, setDiagnoses] = useState<LeafDiagnosis[]>(MOCK_LEAF_DIAGNOSES);
   const [markets] = useState<KenyanMarketPrice[]>(MOCK_MARKET_PRICES);
   const [saccoOptions] = useState<SaccoLoanOption[]>(MOCK_SACCO_OPTIONS);
+  const [alerts, setAlerts] = useState<FarmAlert[]>(MOCK_ALERTS);
+  const [activities, setActivities] = useState<ActivityLog[]>(MOCK_ACTIVITIES);
+  const [hydrated, setHydrated] = useState(false);
 
-  const [alerts, setAlerts] = useState<FarmAlert[]>(() => {
-    try {
-      const saved = localStorage.getItem(`${STORAGE_PREFIX}alerts`);
-      return saved ? JSON.parse(saved) : MOCK_ALERTS;
-    } catch {
-      return MOCK_ALERTS;
-    }
-  });
-
-  const [activities, setActivities] = useState<ActivityLog[]>(() => {
-    try {
-      const saved = localStorage.getItem(`${STORAGE_PREFIX}activities`);
-      return saved ? JSON.parse(saved) : MOCK_ACTIVITIES;
-    } catch {
-      return MOCK_ACTIVITIES;
-    }
-  });
-
-  // Sync to localStorage
   useEffect(() => {
+    try {
+      setProfile(parseJson(localStorage.getItem(`${STORAGE_PREFIX}profile`), MOCK_FARMER_PROFILE));
+      const parsedTwin = parseJson(localStorage.getItem(`${STORAGE_PREFIX}twin`), MOCK_FARM);
+      setTwin({
+        ...MOCK_FARM,
+        ...parsedTwin,
+        mapped: parsedTwin.mapped ?? true,
+        primaryCrop: parsedTwin.primaryCrop ?? MOCK_FARM.primaryCrop,
+      });
+      setZones(parseJson(localStorage.getItem(`${STORAGE_PREFIX}zones`), MOCK_ZONES));
+      setDiagnoses(parseJson(localStorage.getItem(`${STORAGE_PREFIX}diagnoses`), MOCK_LEAF_DIAGNOSES));
+      setAlerts(parseJson(localStorage.getItem(`${STORAGE_PREFIX}alerts`), MOCK_ALERTS));
+      setActivities(parseJson(localStorage.getItem(`${STORAGE_PREFIX}activities`), MOCK_ACTIVITIES));
+    } catch {}
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(`${STORAGE_PREFIX}profile`, JSON.stringify(profile));
     } catch {}
-  }, [profile]);
+  }, [hydrated, profile]);
 
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(`${STORAGE_PREFIX}twin`, JSON.stringify(twin));
     } catch {}
-  }, [twin]);
+  }, [hydrated, twin]);
 
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(`${STORAGE_PREFIX}zones`, JSON.stringify(zones));
     } catch {}
-  }, [zones]);
+  }, [hydrated, zones]);
 
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(`${STORAGE_PREFIX}diagnoses`, JSON.stringify(diagnoses));
     } catch {}
-  }, [diagnoses]);
+  }, [hydrated, diagnoses]);
 
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(`${STORAGE_PREFIX}alerts`, JSON.stringify(alerts));
     } catch {}
-  }, [alerts]);
+  }, [hydrated, alerts]);
 
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem(`${STORAGE_PREFIX}activities`, JSON.stringify(activities));
     } catch {}
-  }, [activities]);
+  }, [hydrated, activities]);
 
   const updateProfile = (updates: Partial<FarmerProfile>) => {
     setProfile((prev) => ({ ...prev, ...updates }));
@@ -206,6 +186,8 @@ export function FarmStateProvider({ children }: { children: React.ReactNode }) {
     crop: string;
     acres: number;
     polygon: Array<[number, number]>;
+    latitude?: number;
+    longitude?: number;
   }) => {
     const now = new Date().toISOString().slice(0, 16).replace("T", " ");
     updateTwin({
@@ -216,6 +198,8 @@ export function FarmStateProvider({ children }: { children: React.ReactNode }) {
       lastSatelliteSync: `${now} EAT`,
       mapped: true,
       primaryCrop: input.crop,
+      ...(typeof input.latitude === "number" ? { latitude: input.latitude } : {}),
+      ...(typeof input.longitude === "number" ? { longitude: input.longitude } : {}),
     });
     setZones([
       {

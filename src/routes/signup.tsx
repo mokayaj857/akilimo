@@ -81,25 +81,29 @@ function SignUp() {
     }
 
     setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/login`,
-        data: { full_name: fullName.trim() },
-      },
-    });
-    setLoading(false);
-
-    if (error) {
-      toast.error(error.message);
-      return;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/login`,
+          data: { full_name: fullName.trim() },
+        },
+      });
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      if (data.session) {
+        navigate({ to: "/onboarding", replace: true });
+        return;
+      }
+      setConfirmationEmail(email.trim());
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not register.");
+    } finally {
+      setLoading(false);
     }
-    if (data.session) {
-      navigate({ to: "/onboarding", replace: true });
-      return;
-    }
-    setConfirmationEmail(email.trim());
   }
 
   async function handleGoogle() {

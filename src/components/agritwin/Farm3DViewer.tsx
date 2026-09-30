@@ -54,6 +54,7 @@ export function Farm3DViewer({
   const zoneMeshesRef = useRef<Map<string, THREE.Mesh>>(new Map());
   const groundMeshRef = useRef<THREE.Mesh | null>(null);
   const copernicusTextureRef = useRef<THREE.Texture | null>(null);
+  const copernicusBboxKey = useRef("");
 
   useEffect(() => {
     const container = mountRef.current;
@@ -485,15 +486,22 @@ export function Farm3DViewer({
     if (groundMeshRef.current) {
       const groundMat = groundMeshRef.current.material as THREE.MeshStandardMaterial;
       if (activeLayer === "copernicus") {
-        if (copernicusTextureRef.current) {
+        const bboxKey = `${twin.latitude.toFixed(4)},${twin.longitude.toFixed(4)}`;
+        if (copernicusTextureRef.current && copernicusBboxKey.current === bboxKey) {
           groundMat.map = copernicusTextureRef.current;
           groundMat.color.setHex(0xffffff);
           groundMat.needsUpdate = true;
         } else {
-          // Fetch live Copernicus Sentinel-2 tile for the farm
+          copernicusBboxKey.current = bboxKey;
+          copernicusTextureRef.current = null;
           fetchCopernicusSentinelImage({
             data: {
-              bbox: [36.885, -1.165, 36.935, -1.125],
+              bbox: [
+                twin.longitude - 0.025,
+                twin.latitude - 0.02,
+                twin.longitude + 0.025,
+                twin.latitude + 0.02,
+              ],
               layer: "TRUE_COLOR",
               width: 512,
               height: 384,
@@ -522,7 +530,7 @@ export function Farm3DViewer({
         groundMat.needsUpdate = true;
       }
     }
-  }, [activeLayer, zones]);
+  }, [activeLayer, zones, twin.latitude, twin.longitude]);
 
   return (
     <div className="relative flex flex-col lg:flex-row h-full min-h-[540px] w-full border border-border bg-card overflow-hidden">
